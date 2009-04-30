@@ -62,7 +62,8 @@ endef
 
 sources := \
     test_algorithm.cpp \
-    test_string.cpp
+    test_string.cpp \
+    test_type_traits.cpp
 
 # Disable all optimization for the host target to help test tools (valgrind...)
 EXTRA_CFLAGS := -I bionic/libstdc++/include -I external/astl/include -g -O0
