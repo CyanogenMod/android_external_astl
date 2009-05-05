@@ -70,6 +70,50 @@ bool testMax()
     return true;
 }
 
+bool testFill()
+{
+    int array[10];
+
+    std::fill(array, array + 10, 0xaa);
+    EXPECT_TRUE(array[0] == 0xaa);
+    EXPECT_TRUE(array[1] == 0xaa);
+    EXPECT_TRUE(array[2] == 0xaa);
+    EXPECT_TRUE(array[3] == 0xaa);
+    EXPECT_TRUE(array[4] == 0xaa);
+    EXPECT_TRUE(array[5] == 0xaa);
+    EXPECT_TRUE(array[6] == 0xaa);
+    EXPECT_TRUE(array[7] == 0xaa);
+    EXPECT_TRUE(array[8] == 0xaa);
+    EXPECT_TRUE(array[9] == 0xaa);
+    return true;
+}
+
+bool testFill_N()
+{
+    int array[10];
+
+    int *ret = std::fill_n(array, 10, 0xaa);
+    EXPECT_TRUE(array[0] == 0xaa);
+    EXPECT_TRUE(array[1] == 0xaa);
+    EXPECT_TRUE(array[2] == 0xaa);
+    EXPECT_TRUE(array[3] == 0xaa);
+    EXPECT_TRUE(array[4] == 0xaa);
+    EXPECT_TRUE(array[5] == 0xaa);
+    EXPECT_TRUE(array[6] == 0xaa);
+    EXPECT_TRUE(array[7] == 0xaa);
+    EXPECT_TRUE(array[8] == 0xaa);
+    EXPECT_TRUE(array[9] == 0xaa);
+    EXPECT_TRUE(ret == array + 10);
+
+    char array2[1] = { '\0' };
+    signed char sc = 1;
+
+    std::fill_n(array2, 1, sc);
+    EXPECT_TRUE(array2[0] == 1 );
+
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -77,5 +121,7 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testSwapInt);
     FAIL_UNLESS(testMin);
     FAIL_UNLESS(testMax);
+    FAIL_UNLESS(testFill);
+    FAIL_UNLESS(testFill_N);
     return kPassed;
 }

@@ -30,13 +30,21 @@
 #ifndef ANDROID_ASTL_ALGORITHM__
 #define ANDROID_ASTL_ALGORITHM__
 
+#include <cstddef>
+#include <cstring>
+#include <type_traits.h>
+#ifndef ANDROID_ASTL_TYPE_TRAITS_H__
+#error "Wrong file included!"
+#endif
+
 namespace std {
 
 // This file contains the following template functions:
 // - min
 // - max
 // - swap
-
+// - fill
+// - fill_n
 
 template<typename _T> inline const _T& min(const _T& left, const _T& right)
 {
@@ -52,9 +60,133 @@ template<typename _T> inline const _T& max(const _T& left, const _T& right)
 
 template<typename _T> inline void swap(_T& left, _T& right)
 {
-  _T tmp = left;
-  left = right;
-  right = tmp;
+    _T tmp = left;
+    left = right;
+    right = tmp;
+}
+
+// fill the range [begin, end) with copies of value, return nothing.
+// fill_n the range [begin, begin + n) with copies of value, return
+// the pointer at begin + n.
+//
+// TODO: fill and fill_n should take forward and output iterators for
+// begin and end params. Fix this when iterator are defined.
+
+
+template<bool> struct __fill
+{
+    template<typename _T> static void fill(_T *begin, const _T *end,
+                                           const _T& value)
+    {
+        for (; begin < end; ++begin)
+            *begin = value;
+    }
+};
+
+template<> struct __fill<true>  // scalar version
+{
+    template<typename _T> static void fill(_T *begin, const _T *end,
+                                           const _T& value)
+    {
+        const _T tmp = value;
+
+        for (; begin < end; ++begin)
+            *begin = tmp;
+    }
+};
+
+template<typename _T> void fill(_T *begin, _T *end, const _T& value)
+{
+    const bool is_scalar = std::is_scalar<_T>::value;
+    __fill<is_scalar>::fill(begin, end, value);
+}
+
+// Specialization: for one-byte types use memset.
+inline void fill(unsigned char *begin, unsigned char *end,
+                 const unsigned char& value)
+{
+    if (begin < end)
+    {
+        const int tmp = value;
+        std::memset(begin, tmp, end - begin);
+    }
+}
+
+inline void fill(signed char *begin, signed char *end, const signed char& value)
+{
+    if (begin < end)
+    {
+        const int tmp = value;
+        std::memset(begin, tmp, end - begin);
+    }
+}
+
+inline void fill(char *begin, char *end, const char& value)
+{
+    if (begin < end)
+    {
+        const int tmp = value;
+        std::memset(begin, tmp, end - begin);
+    }
+}
+
+template<bool> struct __fill_n
+{
+    template<typename _T> static _T *fill_n(_T *begin, size_t num,
+                                            const _T& value)
+    {
+        for (size_t i = 0; i < num; ++i, ++begin)
+        {
+            *begin = value;
+        }
+        return begin;
+    }
+};
+
+template<> struct __fill_n<true>  // scalar version
+{
+    template<typename _T> static _T *fill_n(_T *begin, size_t num,
+                                            const _T& value)
+    {
+        const _T tmp = value;
+
+        for (size_t i = 0; i < num; ++i, ++begin)
+        {
+            *begin = tmp;
+        }
+        return begin;
+    }
+};
+
+template<typename _T> _T *fill_n(_T *begin, size_t n, const _T& value)
+{
+    const bool is_scalar = std::is_scalar<_T>::value;
+    return __fill_n<is_scalar>::fill_n(begin, n, value);
+}
+
+
+// Specialization: for one-byte types uses memset.
+inline unsigned char *fill_n(unsigned char *begin, size_t num,
+                             const unsigned char& value)
+{
+    const int tmp = value;
+    std::memset(begin, tmp, num);
+    return begin + num;
+}
+
+inline signed char *fill_n(signed char *begin, size_t num,
+                           const signed char& value)
+{
+    const int tmp = value;
+    std::memset(begin, tmp, num);
+    return begin + num;
+}
+
+inline char *fill_n(char *begin, size_t num, const char& value)
+{
+    const int tmp = value;
+    std::memset(begin, tmp, num);
+    return begin + num;
 }
 
 }  // namespace std
