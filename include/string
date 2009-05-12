@@ -48,6 +48,8 @@ namespace std {
 // . The implementation is not optimized in any way (no copy on write support),
 // temporary instance may be expensive.
 // . Currently there is no support for iterators.
+//
+// TODO: use size_type instead of size_t to be consistent.
 
 class string
 {
@@ -148,8 +150,8 @@ class string
     // @return Number of elements for which memory has been allocated. capacity >= size().
     size_t capacity() const { return mCapacity; }
 
-    // Change the capacity to new_size. No effect if
-    // new_size < size(). 0 means Shrink to fit.
+    // Change the capacity to new_size. No effect if new_size < size().
+    // 0 means Shrink to fit.
     // @param new_size number of character to be allocated.
     void reserve(size_t new_size = 0);
 
@@ -171,7 +173,7 @@ class string
     string& operator=(char c);
 
     string& assign(const string& str);
-    // Assign a substring of the original
+    // Assign a substring of the original.
     // @param str Original string.
     // @param pos Index of the start of the copy.
     // @param len Number of character to be copied.
@@ -199,6 +201,28 @@ class string
     friend string operator+(char left, const string& right) {
         return string(&left, 1).append(right);
     }
+
+    // Find the position of a sub-string. The empty string is always
+    // found at the requested position except when it's beyond the
+    // string's end.
+    // @param str String to locate.
+    // @param pos Index of the character to search from. Default to 0.
+    // @return Index of start of the first occurence of the
+    // string. string::npos if no occurence of str was found from the
+    // starting position.
+    size_type find(const string& str, size_type pos = 0) const {
+    return find(str.mData, pos);
+    }
+
+    // Find the position of a C sub-string. The empty string is always
+    // found at the requested position except when it's beyond the
+    // string's end.
+    // @param str C string to locate.
+    // @param pos Index of the character to search from. Default to 0.
+    // @return Index of start of the first occurence of the
+    // string. string::npos if no occurence of str was found from the
+    // starting position.
+    size_type find(const char *str, size_type pos = 0) const;
 
   private:
     bool SafeMalloc(size_t num);

@@ -685,6 +685,73 @@ bool testPushBack()
     return true;
 }
 
+bool testFind()
+{
+  string haystack("one two three one two three");
+
+  // Don't die on null strings
+  EXPECT_TRUE(haystack.find(NULL) == string::npos);
+  EXPECT_TRUE(haystack.find(NULL, 10) == string::npos);
+
+  // C strings.
+  EXPECT_TRUE(haystack.find("one") == 0);
+  EXPECT_TRUE(haystack.find("two") == 4);
+  EXPECT_TRUE(haystack.find("t") == 4);
+  EXPECT_TRUE(haystack.find("four") == string::npos);
+  EXPECT_TRUE(haystack.find("one", string::npos) == string::npos);
+
+  // with offset
+  EXPECT_TRUE(haystack.find("one", 13) == 14);
+  EXPECT_TRUE(haystack.find("one", 14) == 14);
+  EXPECT_TRUE(haystack.find("one", 15) == string::npos);
+  EXPECT_TRUE(haystack.find("e", haystack.size() - 1) == haystack.size() - 1);
+  EXPECT_TRUE(haystack.find("e", haystack.size()) == string::npos);
+  EXPECT_TRUE(haystack.find("one", string::npos) == string::npos);
+
+  // std::string
+  EXPECT_TRUE(haystack.find(string("one")) == 0);
+  EXPECT_TRUE(haystack.find(string("two")) == 4);
+  EXPECT_TRUE(haystack.find(string("t")) == 4);
+  EXPECT_TRUE(haystack.find(string("four")) == string::npos);
+  EXPECT_TRUE(haystack.find(string("one"), string::npos) == string::npos);
+
+  // with offset
+  EXPECT_TRUE(haystack.find(string("one"), 13) == 14);
+  EXPECT_TRUE(haystack.find(string("one"), 14) == 14);
+  EXPECT_TRUE(haystack.find(string("one"), 15) == string::npos);
+  EXPECT_TRUE(haystack.find(string("e"), haystack.size() - 1) == haystack.size() - 1);
+  EXPECT_TRUE(haystack.find(string("e"), haystack.size()) == string::npos);
+  EXPECT_TRUE(haystack.find(string("one"), string::npos) == string::npos);
+
+  // Emtpy string should be found at every position in a string except
+  // past the end.
+  EXPECT_TRUE(string().find("", 0) == 0);
+  EXPECT_TRUE(string().find(string(), 0) == 0);
+  EXPECT_TRUE(string().find(string(), 10) == string::npos);
+
+  string foo = "foo";
+  EXPECT_TRUE(foo.find("", 0) == 0);
+  EXPECT_TRUE(foo.find(string(), 0) == 0);
+  EXPECT_TRUE(foo.find(string(""), 0) == 0);
+
+  EXPECT_TRUE(foo.find("", 1) == 1);
+  EXPECT_TRUE(foo.find(string(), 1) == 1);
+  EXPECT_TRUE(foo.find(string(""), 1) == 1);
+
+  EXPECT_TRUE(foo.find("", foo.size()) == foo.size());
+  EXPECT_TRUE(foo.find(string(), foo.size()) == foo.size());
+  EXPECT_TRUE(foo.find(string(""), foo.size()) == foo.size());
+
+  EXPECT_TRUE(foo.find("", foo.size() + 1) == string::npos);
+  EXPECT_TRUE(foo.find(string(), foo.size() + 1) == string::npos);
+  EXPECT_TRUE(foo.find(string(""), foo.size() + 1) == string::npos);
+
+  // Find on an empty string a non empty one should fail
+  EXPECT_TRUE(string().find("f", 0) == string::npos);
+  EXPECT_TRUE(string().find(string("f"), 0) == string::npos);
+  return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -705,5 +772,6 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testAccessor);
     FAIL_UNLESS(testSwap);
     FAIL_UNLESS(testPushBack);
+    FAIL_UNLESS(testFind);
     return kPassed;
 }

@@ -471,4 +471,37 @@ string& string::operator=(char c)
     return *this;
 }
 
+string::size_type string::find(const char *str, size_type pos) const
+{
+
+    if (NULL == str)
+    {
+        return string::npos;
+    }
+
+    // Empty string is found everwhere except beyond the end. It is
+    // possible to find the empty string right after the last char,
+    // hence we used mLength and not mLength - 1 in the comparison.
+    if (*str == '\0')
+    {
+        return pos > mLength ? string::npos : pos;
+    }
+
+    if (mLength == 0 || pos > mLength - 1)
+    {
+        return string::npos;
+    }
+
+    char *idx = std::strstr(mData + pos, str);
+
+    if (NULL == idx)
+    {
+        return string::npos;
+    }
+
+    const std::ptrdiff_t delta = idx - mData;
+
+    return static_cast<size_type>(delta);
+}
+
 }  // namespace std
