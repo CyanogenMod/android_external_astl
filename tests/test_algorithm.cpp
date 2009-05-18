@@ -114,6 +114,26 @@ bool testFill_N()
     return true;
 }
 
+struct Left1 { };
+struct Right1 { };
+bool operator==(const Left1&, const Right1&) {return true;}
+
+struct Left2 { };
+struct Right2 { };
+bool predicate(const Left2&, const Right2&) {return true;}
+
+bool testEqual()
+{
+    Left1 left1;
+    Right1 right1;
+    Left2 left2;
+    Right2 right2;
+
+    EXPECT_TRUE(std::equal(&left1, &left1, &right1));
+    EXPECT_TRUE(std::equal(&left2, &left2, &right2, predicate));
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -123,5 +143,6 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testMax);
     FAIL_UNLESS(testFill);
     FAIL_UNLESS(testFill_N);
+    FAIL_UNLESS(testEqual);
     return kPassed;
 }
