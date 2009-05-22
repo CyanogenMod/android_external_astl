@@ -49,7 +49,6 @@ namespace std {
 // temporary instance may be expensive.
 // . Currently there is no support for iterators.
 //
-// TODO: use size_type instead of size_t to be consistent.
 
 class string
 {
@@ -57,7 +56,7 @@ class string
     typedef size_t size_type;
     typedef char   value_type;
 
-    static const size_t  npos = static_cast<size_t>(-1);
+    static const size_type npos = static_cast<size_type>(-1);
 
     // Constructors
     string();
@@ -69,19 +68,19 @@ class string
     // @param idx The index of the character to start the copy at.
     // @param num The number of characters to copy. Use string::npos for the
     // remainder.
-    string(const string& str, size_t idx, size_t num);
+    string(const string& str, size_t idx, size_type num);
 
     // Same as above but implicitely copy from idx to the end of the str.
-    string(const string& str, size_t idx);
+    string(const string& str, size_type idx);
 
     // Construct a string from a C string.
     // @param str The source string, must be '\0' terminated.
-    string(const char *str);
+    string(const value_type *str);
 
     // Construct a string from a char array.
     // @param str The source C string. '\0' are ignored.
     // @param num The number of characters to copy.
-    string(const char *str, size_t num);
+    string(const value_type *str, size_type num);
 
     // Construct a string from a repetition of a character.
     // @param num The number of characters.
@@ -92,18 +91,18 @@ class string
     // @param begin The start of the source C string. '\0' are ignored.
     // @param end The end of source C string. Points just pass the last
     // character.
-    string(const char *begin, const char *end);
+    string(const value_type *begin, const value_type *end);
 
     ~string();
 
     // @return The number of characters in the string, not including any
     // null-termination.
-    const size_t length() const { return mLength; }
-    const size_t size() const { return mLength; }
+    size_type length() const { return mLength; }
+    size_type size() const { return mLength; }
 
     // @return A pointer to null-terminated contents.
-    const char *c_str() const { return mData; }
-    const char *data() const { return mData; }
+    const value_type *c_str() const { return mData; }
+    const value_type *data() const { return mData; }
 
     // Clear the string. Empty on return.
     void clear();
@@ -117,7 +116,7 @@ class string
 
     // @param str The C string to be append.
     // @return A reference to this string.
-    string& operator+=(const char *str) { return this->append(str); }
+    string& operator+=(const value_type *str) { return this->append(str); }
 
     // @param c A character to be append.
     // @return A reference to this string.
@@ -127,33 +126,33 @@ class string
     void push_back(const char c);
 
     // no-op if str is NULL.
-    string& append(const char *str);
+    string& append(const value_type *str);
     // no-op if str is NULL. len must be >= 0.
-    string& append(const char *str, size_t len);
+    string& append(const value_type *str, size_type len);
     // no-op if str is NULL. idx and len must be >= 0.
-    string& append(const char *str, size_t idx, size_t len);
+    string& append(const value_type *str, size_type idx, size_type len);
     string& append(const string& str);
 
     // Comparaison.
     // @return 0 if this==other, < 0 if this < other and > 0 if this > other.
     // Don't assume the values are -1, 0, 1
     int compare(const string& other) const;
-    int compare(const char *other) const;
+    int compare(const value_type *other) const;
 
     friend bool operator==(const string& left, const string& right);
-    friend bool operator==(const string& left, const char *right);
-    friend bool operator==(const char *left, const string& right) { return right == left; }
+    friend bool operator==(const string& left, const value_type *right);
+    friend bool operator==(const value_type *left, const string& right) { return right == left; }
     friend bool operator!=(const string& left, const string& right) { return !(left == right); }
     friend bool operator!=(const string& left, const char* right) { return !(left == right); }
-    friend bool operator!=(const char *left, const string& right) { return !(left == right); }
+    friend bool operator!=(const value_type *left, const string& right) { return !(left == right); }
 
     // @return Number of elements for which memory has been allocated. capacity >= size().
-    size_t capacity() const { return mCapacity; }
+    size_type capacity() const { return mCapacity; }
 
     // Change the capacity to new_size. No effect if new_size < size().
     // 0 means Shrink to fit.
     // @param new_size number of character to be allocated.
-    void reserve(size_t new_size = 0);
+    void reserve(size_type new_size = 0);
 
     // Exchange the content of this with the content of other.
     // @param other Instance to swap this one with.
@@ -162,10 +161,10 @@ class string
     // Accessors.
     // @param idx of the char. No boundary, signed checks are done.
     // @return a const reference to the char.
-    const char& operator[](const size_t idx) const;
+    const char& operator[](const size_type idx) const;
     // @param idx of the char. No boundary, signed checks are done.
     // @return a reference to the char.
-    char& operator[](const size_t idx);
+    char& operator[](const size_type idx);
 
     // Assignments.
     string& operator=(const string& str) { return assign(str); }
@@ -177,22 +176,22 @@ class string
     // @param str Original string.
     // @param pos Index of the start of the copy.
     // @param len Number of character to be copied.
-    string& assign(const string& str, size_t pos, size_t len);
-    string& assign(const char *str);
+    string& assign(const string& str, size_type pos, size_type len);
+    string& assign(const value_type *str);
     // Assign a non terminated array of chars.
     // @param array Of chars non-null terminated.
     // @param len Length of the array.
-    string& assign(const char *array, size_t len);
+    string& assign(const value_type *array, size_type len);
 
     // Concat. Prefer using += or append.
     // Uses unamed object for return value optimization.
     friend string operator+(const string& left, const string& right) {
         return string(left).append(right);
     }
-    friend string operator+(const string& left, const char *right) {
+    friend string operator+(const string& left, const value_type *right) {
         return string(left).append(right);
     }
-    friend string operator+(const char *left, const string& right) {
+    friend string operator+(const value_type *left, const string& right) {
         return string(left).append(right);
     }
     friend string operator+(const string& left, char right) {
@@ -222,23 +221,23 @@ class string
     // @return Index of start of the first occurence of the
     // string. string::npos if no occurence of str was found from the
     // starting position.
-    size_type find(const char *str, size_type pos = 0) const;
+    size_type find(const value_type *str, size_type pos = 0) const;
 
   private:
-    bool SafeMalloc(size_t num);
-    void SafeRealloc(size_t num);
-    void SafeFree(char *str);
-    void ResetTo(char *str);
+    bool SafeMalloc(size_type num);
+    void SafeRealloc(size_type num);
+    void SafeFree(value_type *str);
+    void ResetTo(value_type *str);
     void ConstructEmptyString();
-    void Constructor(const char *str, size_t num);
-    void Constructor(const char *str, size_t pos, size_t num);
-    void Constructor(size_t num, char c);
+    void Constructor(const value_type *str, size_type num);
+    void Constructor(const value_type *str, size_type pos, size_type num);
+    void Constructor(size_type num, char c);
     void DeleteSafe();
-    void Append(const char *str, size_t len);
+    void Append(const value_type *str, size_type len);
 
-    char *mData;  // pointer to the buffer
-    size_t mCapacity;  // size of the buffer.
-    size_t mLength;  // len of the string excl. null-terminator.
+    value_type *mData;  // pointer to the buffer
+    size_type mCapacity;  // size of the buffer.
+    size_type mLength;  // len of the string excl. null-terminator.
 };
 
 }  // namespace std
