@@ -162,7 +162,12 @@ bool testConstructorRepeatChar()
     {
         string str03(i, 'x');
 
+        EXPECT_TRUE(str03[i] == '\0');
+        EXPECT_TRUE(str03.length() == i);
+
         str03.reserve(i + 20);
+        EXPECT_TRUE(str03.capacity() == i + 20);
+        EXPECT_TRUE(str03.length() == i);
         EXPECT_TRUE(str03[i] == '\0');
     }
 
