@@ -158,7 +158,7 @@ bool testConstructorRepeatChar()
     EXPECT_TRUE(str02.size() == 10);
     EXPECT_TRUE(str02.capacity() == 10);
 
-    for (int i = 0; i < 100; ++i)
+    for (size_t i = 0; i < 100; ++i)
     {
         string str03(i, 'x');
 
@@ -757,6 +757,119 @@ bool testFind()
   return true;
 }
 
+bool testCapacity()
+{
+  string empty_string;
+
+  EXPECT_TRUE(empty_string.capacity() == 0);
+  EXPECT_TRUE(empty_string.size() == 0);
+
+  const char *text = "non empty string";
+  const size_t len = strlen(text);
+  string str01(text);
+
+  EXPECT_TRUE(str01.capacity() == len);
+  EXPECT_TRUE(str01.size() == len);
+  return true;
+}
+
+bool testClear()
+{
+  string empty_string;
+
+  empty_string.clear();
+  EXPECT_TRUE(empty_string.capacity() == 0);
+  EXPECT_TRUE(empty_string.size() == 0);
+
+  string str01("non empty string");
+
+  str01.clear();
+  EXPECT_TRUE(str01.capacity() == 0);
+  EXPECT_TRUE(str01.size() == 0);
+  EXPECT_TRUE(str01.empty());
+  return true;
+}
+
+bool testErase()
+{
+  {
+    string empty_string;
+
+    empty_string.erase();
+    EXPECT_TRUE(empty_string.capacity() == 0);
+    EXPECT_TRUE(empty_string.size() == 0);
+
+    empty_string.erase(MAX_SIZE_T);
+    EXPECT_TRUE(empty_string.capacity() == 0);
+    EXPECT_TRUE(empty_string.size() == 0);
+
+    empty_string.erase(MAX_SIZE_T, MAX_SIZE_T);
+    EXPECT_TRUE(empty_string.capacity() == 0);
+    EXPECT_TRUE(empty_string.size() == 0);
+  }
+
+  {
+    string str01("a");
+
+    str01.erase();
+    EXPECT_TRUE(str01.capacity() == 1);
+    EXPECT_TRUE(str01.size() == 0);
+  }
+
+  {
+    string str02("a");
+
+    str02.erase(MAX_SIZE_T);
+    EXPECT_TRUE(str02.capacity() == 1);
+    EXPECT_TRUE(str02.size() == 1);
+  }
+
+  {
+    string str03("a");
+
+    str03.erase(0, MAX_SIZE_T);
+    EXPECT_TRUE(str03.capacity() == 1);
+    EXPECT_TRUE(str03.size() == 0);
+  }
+
+  {
+    string str04("a");
+
+    str04.erase(1, MAX_SIZE_T);
+    EXPECT_TRUE(str04.capacity() == 1);
+    EXPECT_TRUE(str04.size() == 1);
+  }
+
+  {
+    string str05("abcd");
+
+    str05.erase(1, 2);
+    EXPECT_TRUE(str05.capacity() == 4);
+    EXPECT_TRUE(str05.size() == 2);
+    EXPECT_TRUE(str05 == "ad");
+  }
+
+  {
+    string str06("abcd");
+
+    str06.erase(0, 1);
+    EXPECT_TRUE(str06.capacity() == 4);
+    EXPECT_TRUE(str06.size() == 3);
+    EXPECT_TRUE(str06 == "bcd");
+  }
+
+  {
+    // overlap
+    string str07("oh my god (You think I'm in control)");
+
+    str07.erase(0, strlen("oh my god "));
+    EXPECT_TRUE(str07.size() == 26);
+    EXPECT_TRUE(str07 == "(You think I'm in control)");
+  }
+
+  return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -778,5 +891,8 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testSwap);
     FAIL_UNLESS(testPushBack);
     FAIL_UNLESS(testFind);
+    FAIL_UNLESS(testCapacity);
+    FAIL_UNLESS(testClear);
+    FAIL_UNLESS(testErase);
     return kPassed;
 }
