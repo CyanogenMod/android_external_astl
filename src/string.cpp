@@ -104,7 +104,7 @@ void string::SafeRealloc(size_type num)
     value_type *oldData = mData;
 
     mData = static_cast<char*>(::realloc(mData, num + 1));
-    if (NULL == mData) // realloc failed.
+    if (NULL == mData) // reallocate failed.
     {
         mData = oldData;
     }
@@ -252,11 +252,37 @@ void string::clear()
     ResetTo(kEmptyString);
 }
 
+string& string::erase(size_type pos, size_type len)
+{
+    if (pos >= mLength || 0 == len)
+    {
+        return *this;
+    }
+    // start of the characters left which need to be moved down.
+    const size_t remainder = pos + len;
+
+    // Truncate, even if there is an overflow.
+    if (remainder >= mLength || remainder < pos)
+    {
+        *(mData + pos) = '\0';
+        mLength = pos;
+        return *this;
+    }
+    // remainder < mLength and allocation guarantees to be at least
+    // mLength + 1
+    size_t left = mLength - remainder + 1;
+    value_type *d = mData + pos;
+    value_type *s = mData + remainder;
+    memmove(d, s, left);
+    mLength -= len;
+    return *this;
+}
+
 void string::Append(const value_type *str, size_type len)
 {
     const size_type total_len = mLength + len;
 
-    // len > 0 and no overflow for the string length + terminating nul.
+    // len > 0 and no overflow for the string length + terminating null.
     if (len > 0 && (total_len + 1) > mLength)
     {
         if (total_len > mCapacity)
@@ -486,7 +512,7 @@ string::size_type string::find(const value_type *str, size_type pos) const
         return string::npos;
     }
 
-    // Empty string is found everwhere except beyond the end. It is
+    // Empty string is found everywhere except beyond the end. It is
     // possible to find the empty string right after the last char,
     // hence we used mLength and not mLength - 1 in the comparison.
     if (*str == '\0')

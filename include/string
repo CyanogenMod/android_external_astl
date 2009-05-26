@@ -70,7 +70,7 @@ class string
     // remainder.
     string(const string& str, size_t idx, size_type num);
 
-    // Same as above but implicitely copy from idx to the end of the str.
+    // Same as above but implicitly copy from idx to the end of the str.
     string(const string& str, size_type idx);
 
     // Construct a string from a C string.
@@ -104,11 +104,27 @@ class string
     const value_type *c_str() const { return mData; }
     const value_type *data() const { return mData; }
 
-    // Clear the string. Empty on return.
+    // Empty the string on return. Release the internal buffer. Length
+    // and capacity are both 0 on return. If you want to keep the
+    // internal buffer around for reuse, call 'erase' instead.
     void clear();
 
     // @return true if the string is empty.
     bool empty() const { return this->size() == 0; }
+
+    // Remove 'len' characters from the string starting at 'pos'. The
+    // string length is reduced by 'len'. If len is greater or equal
+    // to the number of characters in the string, it is truncated at
+    // 'pos'. If 'pos' is beyond the end of the string, 'erase' does
+    // nothing. Note, regular STL implementations throw a out_of_range
+    // exception in this case.
+    // Internally, the capacity of the buffer remains unchanged. If
+    // you wanted to recover the deleted chars' memory you should call
+    // 'reserve' explicitly (see also 'clear').
+    // @param pos Index of the first character to remove (default to 0)
+    // @param len Number of characters to delete. (default to remainder)
+    // @return a reference to this string.
+    string& erase(size_type pos = 0, size_type len = npos);
 
     // @param str The string to be append.
     // @return A reference to this string.
@@ -133,7 +149,7 @@ class string
     string& append(const value_type *str, size_type idx, size_type len);
     string& append(const string& str);
 
-    // Comparaison.
+    // Comparison.
     // @return 0 if this==other, < 0 if this < other and > 0 if this > other.
     // Don't assume the values are -1, 0, 1
     int compare(const string& other) const;
@@ -184,7 +200,7 @@ class string
     string& assign(const value_type *array, size_type len);
 
     // Concat. Prefer using += or append.
-    // Uses unamed object for return value optimization.
+    // Uses unnamed object for return value optimization.
     friend string operator+(const string& left, const string& right) {
         return string(left).append(right);
     }
@@ -206,11 +222,11 @@ class string
     // string's end.
     // @param str String to locate.
     // @param pos Index of the character to search from. Default to 0.
-    // @return Index of start of the first occurence of the
-    // string. string::npos if no occurence of str was found from the
+    // @return Index of start of the first occurrence of the
+    // string. string::npos if no occurrence of str was found from the
     // starting position.
     size_type find(const string& str, size_type pos = 0) const {
-    return find(str.mData, pos);
+        return find(str.mData, pos);
     }
 
     // Find the position of a C sub-string. The empty string is always
@@ -218,8 +234,8 @@ class string
     // string's end.
     // @param str C string to locate.
     // @param pos Index of the character to search from. Default to 0.
-    // @return Index of start of the first occurence of the
-    // string. string::npos if no occurence of str was found from the
+    // @return Index of start of the first occurrence of the
+    // string. string::npos if no occurrence of str was found from the
     // starting position.
     size_type find(const value_type *str, size_type pos = 0) const;
 
