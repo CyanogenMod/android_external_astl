@@ -61,17 +61,12 @@ class string
     // Constructors
     string();
 
-    string(const string& str);
-
     // Construct a string from a source's substring.
     // @param str The source string.
     // @param pos The index of the character to start the copy at.
     // @param n The number of characters to copy. Use string::npos for the
     // remainder.
-    string(const string& str, size_t pos, size_type n);
-
-    // Same as above but implicitly copy from pos to the end of the str.
-    string(const string& str, size_type pos);
+    string(const string& str, size_t pos = 0, size_type n = npos);
 
     // Construct a string from a C string.
     // @param str The source string, must be '\0' terminated.
@@ -240,6 +235,11 @@ class string
     // string. string::npos if no occurrence of str was found from the
     // starting position.
     size_type find(const value_type *str, size_type pos = 0) const;
+
+    // @return a substring of this one.
+    string substr(size_type pos = 0, size_type n = npos) const {
+        return string(*this, pos, n);
+    }
 
   private:
     bool SafeMalloc(size_type n);
