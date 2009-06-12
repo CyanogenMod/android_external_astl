@@ -65,13 +65,13 @@ class string
 
     // Construct a string from a source's substring.
     // @param str The source string.
-    // @param idx The index of the character to start the copy at.
-    // @param num The number of characters to copy. Use string::npos for the
+    // @param pos The index of the character to start the copy at.
+    // @param n The number of characters to copy. Use string::npos for the
     // remainder.
-    string(const string& str, size_t idx, size_type num);
+    string(const string& str, size_t pos, size_type n);
 
-    // Same as above but implicitly copy from idx to the end of the str.
-    string(const string& str, size_type idx);
+    // Same as above but implicitly copy from pos to the end of the str.
+    string(const string& str, size_type pos);
 
     // Construct a string from a C string.
     // @param str The source string, must be '\0' terminated.
@@ -79,13 +79,13 @@ class string
 
     // Construct a string from a char array.
     // @param str The source C string. '\0' are ignored.
-    // @param num The number of characters to copy.
-    string(const value_type *str, size_type num);
+    // @param n The number of characters to copy.
+    string(const value_type *str, size_type n);
 
     // Construct a string from a repetition of a character.
-    // @param num The number of characters.
+    // @param n The number of characters.
     // @param c The character to use.
-    string(size_t num, char c);
+    string(size_t n, char c);
 
     // Construct a string from a char array.
     // @param begin The start of the source C string. '\0' are ignored.
@@ -122,9 +122,9 @@ class string
     // you wanted to recover the deleted chars' memory you should call
     // 'reserve' explicitly (see also 'clear').
     // @param pos Index of the first character to remove (default to 0)
-    // @param len Number of characters to delete. (default to remainder)
+    // @param n Number of characters to delete. (default to remainder)
     // @return a reference to this string.
-    string& erase(size_type pos = 0, size_type len = npos);
+    string& erase(size_type pos = 0, size_type n = npos);
 
     // @param str The string to be append.
     // @return A reference to this string.
@@ -143,10 +143,10 @@ class string
 
     // no-op if str is NULL.
     string& append(const value_type *str);
-    // no-op if str is NULL. len must be >= 0.
-    string& append(const value_type *str, size_type len);
-    // no-op if str is NULL. idx and len must be >= 0.
-    string& append(const value_type *str, size_type idx, size_type len);
+    // no-op if str is NULL. n must be >= 0.
+    string& append(const value_type *str, size_type n);
+    // no-op if str is NULL. pos and n must be >= 0.
+    string& append(const value_type *str, size_type pos, size_type n);
     string& append(const string& str);
 
     // Comparison.
@@ -175,12 +175,13 @@ class string
     void swap(string& other);
 
     // Accessors.
-    // @param idx of the char. No boundary, signed checks are done.
+    // @param pos of the char. No boundary, signed checks are done.
     // @return a const reference to the char.
-    const char& operator[](const size_type idx) const;
-    // @param idx of the char. No boundary, signed checks are done.
+    const char& operator[](const size_type pos) const;
+
+    // @param pos of the char. No boundary, signed checks are done.
     // @return a reference to the char.
-    char& operator[](const size_type idx);
+    char& operator[](const size_type pos);
 
     // Assignments.
     string& operator=(const string& str) { return assign(str); }
@@ -191,11 +192,12 @@ class string
     // Assign a substring of the original.
     // @param str Original string.
     // @param pos Index of the start of the copy.
-    // @param len Number of character to be copied.
-    string& assign(const string& str, size_type pos, size_type len);
+    // @param n Number of character to be copied.
+    string& assign(const string& str, size_type pos, size_type n);
     string& assign(const value_type *str);
-    // Assign a non terminated array of chars.
-    // @param array Of chars non-null terminated.
+
+    // Assign a non-nul terminated array of chars.
+    // @param array Of chars non-nul terminated.
     // @param len Length of the array.
     string& assign(const value_type *array, size_type len);
 
@@ -240,13 +242,13 @@ class string
     size_type find(const value_type *str, size_type pos = 0) const;
 
   private:
-    bool SafeMalloc(size_type num);
-    void SafeRealloc(size_type num);
+    bool SafeMalloc(size_type n);
+    void SafeRealloc(size_type n);
     void SafeFree(value_type *str);
     void ResetTo(value_type *str);
     void ConstructEmptyString();
-    void Constructor(const value_type *str, size_type num);
-    void Constructor(const value_type *str, size_type pos, size_type num);
+    void Constructor(const value_type *str, size_type n);
+    void Constructor(const value_type *str, size_type pos, size_type n);
     void Constructor(size_type num, char c);
     void DeleteSafe();
     void Append(const value_type *str, size_type len);

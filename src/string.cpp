@@ -56,25 +56,24 @@ namespace std {
 // mLength is the number of char in the string, excluding the terminating '\0'.
 //
 // TODO: replace the overflow checks with some better named macros.
-
-
-// Allocate num + 1number of bytes for the string. Update mCapacity.
+//
+// Allocate n + 1 number of bytes for the string. Update mCapacity.
 // Ensure that mCapacity + 1 and mLength + 1 is accessible.
 // In case of error the original state of the string is restored.
-// @param num Number of bytes requested. String allocate num + 1 to hold
+// @param n Number of bytes requested. String allocate n + 1 to hold
 //            the terminating '\0'.
 // @return true if the buffer could be allocated, false otherwise.
-bool string::SafeMalloc(size_type num)
+bool string::SafeMalloc(size_type n)
 {
     // Not empty and no overflow
-    if (num > 0 && num + 1 > num)
+    if (n > 0 && n + 1 > n)
     {
         value_type *oldData = mData;
 
-        mData = static_cast<value_type *>(::malloc(num + 1));
+        mData = static_cast<value_type *>(::malloc(n + 1));
         if (NULL != mData)
         {
-            mCapacity = num;
+            mCapacity = n;
             return true;
         }
         mData = oldData;  // roll back
@@ -82,20 +81,20 @@ bool string::SafeMalloc(size_type num)
     return false;
 }
 
-// Resize the buffer pointed by mData if num >= mLength.
+// Resize the buffer pointed by mData if n >= mLength.
 // mData points to an allocated buffer or the empty string.
-// @param num The number of bytes for the internal buffer.
+// @param n The number of bytes for the internal buffer.
 //            Must be > mLength and > 0.
-void string::SafeRealloc(size_type num)
+void string::SafeRealloc(size_type n)
 {
-    // truncation or nothing to do or num too big (overflow)
-    if (num < mLength || num == mCapacity || num + 1 < num) {
+    // truncation or nothing to do or n too big (overflow)
+    if (n < mLength || n == mCapacity || n + 1 < n) {
         return;
     }
 
     if (kEmptyString == mData)
     {
-        if (SafeMalloc(num)) {
+        if (SafeMalloc(n)) {
             *mData = '\0';
         }
         return;
@@ -103,14 +102,14 @@ void string::SafeRealloc(size_type num)
 
     value_type *oldData = mData;
 
-    mData = static_cast<char*>(::realloc(mData, num + 1));
+    mData = static_cast<char*>(::realloc(mData, n + 1));
     if (NULL == mData) // reallocate failed.
     {
         mData = oldData;
     }
     else
     {
-        mCapacity = num;
+        mCapacity = n;
     }
 }
 
@@ -137,34 +136,33 @@ void string::ConstructEmptyString()
     mCapacity = 0;
 }
 
-void string::Constructor(const value_type *str, size_type num)
+void string::Constructor(const value_type *str, size_type n)
 {
-    Constructor(str, 0, num);
+    Constructor(str, 0, n);
 }
 
 
-void string::Constructor(const value_type *str, size_type pos, size_type num)
+void string::Constructor(const value_type *str, size_type pos, size_type n)
 {
     // Enough data and no overflow
-
-    if (SafeMalloc(num))
+    if (SafeMalloc(n))
     {
-        memcpy(mData, str + pos, num);
-        mLength = num;
+        memcpy(mData, str + pos, n);
+        mLength = n;
         mData[mLength] = '\0';
         return;  // Success
     }
     ConstructEmptyString();
 }
 
-void string::Constructor(size_type num, char c)
+void string::Constructor(size_type n, char c)
 {
     // Enough data and no overflow
 
-    if (SafeMalloc(num))
+    if (SafeMalloc(n))
     {
-        memset(mData, c, num);
-        mLength = num;
+        memset(mData, c, n);
+        mLength = n;
         mData[mLength] = '\0';
         return;  // Success
     }
@@ -181,11 +179,11 @@ string::string(const string& str)
     Constructor(str.mData, str.mLength);
 }
 
-string::string(const string& str, size_type idx, size_type num)
+string::string(const string& str, size_type pos, size_type n)
 {
-    if (idx < str.mLength && num <= (str.mLength - idx))
+    if (pos < str.mLength && n <= (str.mLength - pos))
     {
-        Constructor(str.mData + idx , num);
+        Constructor(str.mData + pos , n);
     }
     else
     {
@@ -193,11 +191,11 @@ string::string(const string& str, size_type idx, size_type num)
     }
 }
 
-string::string(const string& str, size_type idx)
+string::string(const string& str, size_type pos)
 {
-    if (idx < str.mLength)
+    if (pos < str.mLength)
     {
-        Constructor(str.mData, idx, str.mLength - idx);
+        Constructor(str.mData, pos, str.mLength - pos);
     }
     else
     {
@@ -217,15 +215,15 @@ string::string(const value_type *str)
     }
 }
 
-string::string(const value_type *str, size_type num)
+string::string(const value_type *str, size_type n)
 {
-    Constructor(str, num);
+    Constructor(str, n);
 }
 
 // Char repeat constructor.
-string::string(size_type num, char c)
+string::string(size_type n, char c)
 {
-    Constructor(num, c);
+    Constructor(n, c);
 }
 
 string::string(const value_type *begin, const value_type *end)
@@ -252,14 +250,14 @@ void string::clear()
     ResetTo(kEmptyString);
 }
 
-string& string::erase(size_type pos, size_type len)
+string& string::erase(size_type pos, size_type n)
 {
-    if (pos >= mLength || 0 == len)
+    if (pos >= mLength || 0 == n)
     {
         return *this;
     }
     // start of the characters left which need to be moved down.
-    const size_t remainder = pos + len;
+    const size_t remainder = pos + n;
 
     // Truncate, even if there is an overflow.
     if (remainder >= mLength || remainder < pos)
@@ -274,16 +272,16 @@ string& string::erase(size_type pos, size_type len)
     value_type *d = mData + pos;
     value_type *s = mData + remainder;
     memmove(d, s, left);
-    mLength -= len;
+    mLength -= n;
     return *this;
 }
 
-void string::Append(const value_type *str, size_type len)
+void string::Append(const value_type *str, size_type n)
 {
-    const size_type total_len = mLength + len;
+    const size_type total_len = mLength + n;
 
-    // len > 0 and no overflow for the string length + terminating null.
-    if (len > 0 && (total_len + 1) > mLength)
+    // n > 0 and no overflow for the string length + terminating null.
+    if (n > 0 && (total_len + 1) > mLength)
     {
         if (total_len > mCapacity)
         {
@@ -293,7 +291,7 @@ void string::Append(const value_type *str, size_type len)
                 return;
             }
         }
-        memcpy(mData + mLength, str, len);
+        memcpy(mData + mLength, str, n);
         mLength = total_len;
         mData[mLength] = '\0';
     }
@@ -308,20 +306,20 @@ string& string::append(const value_type *str)
     return *this;
 }
 
-string& string::append(const value_type *str, size_type len)
+string& string::append(const value_type *str, size_type n)
 {
     if (NULL != str)
     {
-        Append(str, len);
+        Append(str, n);
     }
     return *this;
 }
 
-string& string::append(const value_type *str, size_type idx, size_type len)
+string& string::append(const value_type *str, size_type pos, size_type n)
 {
     if (NULL != str)
     {
-        Append(str + idx, len);
+        Append(str + pos, n);
     }
     return *this;
 }
@@ -444,14 +442,14 @@ void string::swap(string& other)
     other.mLength = tmp_mLength;
 }
 
-const char& string::operator[](const size_type idx) const
+const char& string::operator[](const size_type pos) const
 {
-    return mData[idx];
+    return mData[pos];
 }
 
-char& string::operator[](const size_type idx)
+char& string::operator[](const size_type pos)
 {
-    return mData[idx];
+    return mData[pos];
 }
 
 string& string::assign(const string& str)
@@ -461,16 +459,16 @@ string& string::assign(const string& str)
     return *this;
 }
 
-string& string::assign(const string& str, size_type pos, size_type len)
+string& string::assign(const string& str, size_type pos, size_type n)
 {
     if (pos >= str.mLength)
     {  // pos is out of bound
         return *this;
     }
-    if (len <= str.mLength - pos)
+    if (n <= str.mLength - pos)
     {
         clear();
-        Constructor(str.mData, pos, len);
+        Constructor(str.mData, pos, n);
     }
     return *this;
 }
@@ -486,14 +484,14 @@ string& string::assign(const value_type *str)
     return *this;
 }
 
-string& string::assign(const value_type *array, size_type len)
+string& string::assign(const value_type *array, size_type n)
 {
-    if (NULL == array || 0 == len)
+    if (NULL == array || 0 == n)
     {
         return *this;
     }
     clear();
-    Constructor(array, len);
+    Constructor(array, n);
     return *this;
 }
 
