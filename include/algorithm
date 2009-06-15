@@ -199,6 +199,7 @@ inline char *fill_n(char *begin, size_t num, const char& value)
 // TODO: When we have a proper structure for iterator as opposed to
 // just pointers, we should be able to the get the type for the values
 // referenced by the iterator and default to memcmp for simple types.
+// TODO: equal should degrade to memcmp for pod.
 template<typename _InputIterator1, typename _InputIterator2>
 inline bool equal(_InputIterator1 begin1, _InputIterator1 end1,
                   _InputIterator2 begin2)
