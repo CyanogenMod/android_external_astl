@@ -33,8 +33,11 @@
 #endif
 #include <climits>
 #include <cstring>
-#include "common.h"
+#include "macros.h"
 
+#ifndef MAX_SIZE_T
+#define MAX_SIZE_T           (~(size_t)0)
+#endif
 
 namespace android {
 using std::string;
@@ -318,7 +321,7 @@ bool testReserve()
     str07.reserve(10);
     EXPECT_TRUE(str07.capacity() == 10);
 
-    str07.reserve(kMaxSizeT);
+    str07.reserve(MAX_SIZE_T);
 
     EXPECT_TRUE(str07.capacity() == 10);
 
@@ -380,9 +383,9 @@ bool testAppend()
     string str12("original");
     char dummy[] = "unused";
     // We lie about the size but that is ok. Since the lenght of the new string
-    // is going to be kMaxSizeT, the call will have not effect (there is no
+    // is going to be MAX_SIZE_T, the call will have not effect (there is no
     // space for the trailing '\0').
-    str12.append(dummy, kMaxSizeT);
+    str12.append(dummy, MAX_SIZE_T);
     EXPECT_TRUE(str12 == "original");
 
     return true;
@@ -796,11 +799,11 @@ bool testErase()
     EXPECT_TRUE(empty_string.capacity() == 0);
     EXPECT_TRUE(empty_string.size() == 0);
 
-    empty_string.erase(kMaxSizeT);
+    empty_string.erase(MAX_SIZE_T);
     EXPECT_TRUE(empty_string.capacity() == 0);
     EXPECT_TRUE(empty_string.size() == 0);
 
-    empty_string.erase(kMaxSizeT, kMaxSizeT);
+    empty_string.erase(MAX_SIZE_T, MAX_SIZE_T);
     EXPECT_TRUE(empty_string.capacity() == 0);
     EXPECT_TRUE(empty_string.size() == 0);
   }
@@ -816,7 +819,7 @@ bool testErase()
   {
     string str02("a");
 
-    str02.erase(kMaxSizeT);
+    str02.erase(MAX_SIZE_T);
     EXPECT_TRUE(str02.capacity() == 1);
     EXPECT_TRUE(str02.size() == 1);
   }
@@ -824,7 +827,7 @@ bool testErase()
   {
     string str03("a");
 
-    str03.erase(0, kMaxSizeT);
+    str03.erase(0, MAX_SIZE_T);
     EXPECT_TRUE(str03.capacity() == 1);
     EXPECT_TRUE(str03.size() == 0);
   }
@@ -832,7 +835,7 @@ bool testErase()
   {
     string str04("a");
 
-    str04.erase(1, kMaxSizeT);
+    str04.erase(1, MAX_SIZE_T);
     EXPECT_TRUE(str04.capacity() == 1);
     EXPECT_TRUE(str04.size() == 1);
   }

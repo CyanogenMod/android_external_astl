@@ -31,7 +31,7 @@
 #ifndef ANDROID_ASTL_ALGORITHM__
 #error "Wrong header included!!"
 #endif
-#include "common.h"
+#include "macros.h"
 
 namespace android {
 

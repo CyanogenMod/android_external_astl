@@ -27,65 +27,27 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ANDROID_ASTL_TESTS_COMMON__
-#define ANDROID_ASTL_TESTS_COMMON__
+#ifndef ANDROID_ASTL_TESTS_MACROS__
+#define ANDROID_ASTL_TESTS_MACROS__
+
+// Common macros for tests.
 #include <cstdio>
 
-// Classes and macros used in tests.
 namespace {
-const size_t kMaxSizeT = ~((size_t)0);
 const int kPassed = 0;
 const int kFailed = 1;
 #define FAIL_UNLESS(v) if (!android::v()) return kFailed;
 
-#define EXPECT_TRUE(expr)                                   \
-    if (!(expr)) {                                          \
+#define EXPECT_TRUE(expr)                                       \
+    if (!(expr)) {                                              \
         std::fprintf(stderr, "%d: %s\n", __LINE__, #expr);	\
-        return false;                                       \
+        return false;                                           \
     }
 
 #ifndef ARRAYSIZE
 #define ARRAYSIZE(array) (sizeof(array)/sizeof(array[0]))
 #endif
 
-// Cannot be copied.
-struct NoCopy {
-  private:
-    NoCopy(const NoCopy& nc) {}
-};
-
-// Count the number of assignement.
-struct CopyCounter {
-    static size_t mCount;
-
-    CopyCounter() { }
-    CopyCounter& operator=(const CopyCounter& cc) {return *this; }
-    CopyCounter(const CopyCounter& nc) {++mCount;}
-  private:
-};
-
-class CtorDtorCounter {
-  public:
-    static size_t mCtorCount;
-    static size_t mCopyCtorCount;
-    static size_t mAssignCount;
-    static size_t mDtorCount;
-
-    CtorDtorCounter() {++mCtorCount;}
-    CtorDtorCounter(const CtorDtorCounter& nc) {++mCopyCtorCount;}
-    CtorDtorCounter& operator=(const CtorDtorCounter& nc) {++mAssignCount; return *this;}
-    ~CtorDtorCounter() {++mDtorCount;}
-    static void reset() {mCtorCount = 0; mCopyCtorCount = 0; mAssignCount = 0; mDtorCount = 0;}
-  private:
-};
-
-size_t CopyCounter::mCount;
-size_t CtorDtorCounter::mCtorCount;
-size_t CtorDtorCounter::mCopyCtorCount;
-size_t CtorDtorCounter::mAssignCount;
-size_t CtorDtorCounter::mDtorCount;
-
 }  // anonymous namespace
 
-
-#endif  // ANDROID_ASTL_TEST_COMMON__
+#endif  // ANDROID_ASTL_TEST_MACROS__
