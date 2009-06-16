@@ -44,30 +44,32 @@ endef
 # same as 'device-test' but builds a host executable instead
 # you can use EXTRA_LDLIBS to indicate additional linker flags
 #
-# define host-test
-#   $(foreach file,$(1), \
-#     $(eval include $(CLEAR_VARS)) \
-#     $(eval LOCAL_SRC_FILES := $(file)) \
-#     $(eval LOCAL_MODULE := $(notdir $(file:%.cpp=%))) \
-#     $(eval $(info LOCAL_MODULE=$(LOCAL_MODULE) file=$(file))) \
-#     $(eval LOCAL_CFLAGS += $(EXTRA_CFLAGS))  \
-#     $(eval LOCAL_LDLIBS += $(EXTRA_LDLIBS)) \
-#     $(eval LOCAL_MODULE_TAGS := eng tests) \
-#     $(eval LOCAL_STATIC_LIBRARIES := libastl) \
-#     $(eval include $(BUILD_HOST_EXECUTABLE)) \
-#   ) \
-#   $(eval EXTRA_CFLAGS :=) \
-#   $(eval EXTRA_LDLIBS :=)
-# endef
+define host-test
+  $(foreach file,$(1), \
+    $(eval include $(CLEAR_VARS)) \
+    $(eval LOCAL_SRC_FILES := $(file)) \
+    $(eval LOCAL_MODULE := $(notdir $(file:%.cpp=%))) \
+    $(eval $(info LOCAL_MODULE=$(LOCAL_MODULE) file=$(file))) \
+    $(eval LOCAL_CFLAGS += $(EXTRA_CFLAGS))  \
+    $(eval LOCAL_LDLIBS += $(EXTRA_LDLIBS)) \
+    $(eval LOCAL_MODULE_TAGS := eng tests) \
+    $(eval LOCAL_STATIC_LIBRARIES := libastl) \
+    $(eval include $(BUILD_HOST_EXECUTABLE)) \
+  ) \
+  $(eval EXTRA_CFLAGS :=) \
+  $(eval EXTRA_LDLIBS :=)
+endef
 
 sources := \
     test_algorithm.cpp \
     test_string.cpp \
-    test_type_traits.cpp
+    test_type_traits.cpp \
+	test_uninitialized.cpp \
+    test_vector.cpp
 
 # Disable all optimization for the host target to help test tools (valgrind...)
-# EXTRA_CFLAGS := -I bionic/libstdc++/include -I external/astl/include -g -O0
-# $(call host-test, $(sources))
+EXTRA_CFLAGS := -I bionic/libstdc++/include -I external/astl/include -g -O0
+$(call host-test, $(sources))
 
 EXTRA_CFLAGS := -I bionic/libstdc++/include -I external/astl/include
 $(call device-test, $(sources))

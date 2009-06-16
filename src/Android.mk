@@ -35,3 +35,25 @@ LOCAL_SYSTEM_SHARED_LIBRARIES := libc libstdc++ libutils
 LOCAL_MODULE:= libastl
 
 include $(BUILD_STATIC_LIBRARY)
+
+# Define the ASTL_TESTS environment variable to build the host lib
+# needed for testing under valgrind.
+# This is done automatically if you use: runtest astl
+
+ifdef ASTL_TESTS
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := $(astl_common_src_files)
+
+LOCAL_C_INCLUDES := external/astl/include
+
+LOCAL_CFLAGS += -I bionic/libstdc++/include -I external/astl/include
+
+LOCAL_SYSTEM_SHARED_LIBRARIES := libc libstdc++ libutils
+
+LOCAL_MODULE:= libastl
+
+include $(BUILD_HOST_STATIC_LIBRARY)
+
+endif  #ASTL_TESTS

@@ -31,7 +31,7 @@
 #error "Wrong header included!!"
 #endif
 
-#include "macros.h"
+#include "common.h"
 
 namespace android {
 
