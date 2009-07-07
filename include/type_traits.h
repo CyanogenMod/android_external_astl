@@ -153,8 +153,8 @@ struct sfinae_types
 
 // Only classes will match the first declaration (pointer to member).
 // TODO: newer version of gcc have these is_class built in.
-template<typename _Tp>  sfinae_types::one test_pod_type(int _Tp::*);
-template<typename _Tp>  sfinae_types::two& test_pod_type(...);
+template<typename _T>  sfinae_types::one test_pod_type(int _T::*);
+template<typename _T>  sfinae_types::two& test_pod_type(...);
 
 template<typename _T>
 struct is_pod: public integral_constant<bool, sizeof(test_pod_type<_T>(0)) != sizeof(sfinae_types::one)> { };
