@@ -96,10 +96,7 @@ bool testConstructorString()
     string str2 (str1);
     EXPECT_TRUE(str1.size() == 21);
 
-    const char literal[] = "scott mills cracks me up";
-    const string str3(literal);
-    EXPECT_TRUE(str3 == literal);
-
+    const string str3("scott mills cracks me up");
     string str4(str3, 12);
     EXPECT_TRUE(strcmp("cracks me up", str4.c_str()) == 0);
 
@@ -117,12 +114,6 @@ bool testConstructorString()
 
     string str9(str3, 24, 1);
     EXPECT_TRUE(strcmp("", str9.c_str()) == 0);
-
-    string str10(str3, 0);
-    EXPECT_TRUE(strcmp(literal, str10.c_str()) == 0);
-
-    string str11(str3, 6);
-    EXPECT_TRUE(strcmp("mills cracks me up", str11.c_str()) == 0);
 
     return true;
 }
@@ -876,32 +867,6 @@ bool testErase()
   return true;
 }
 
-bool testSubstr()
-{
-    const char literal[] = "basement jaxx";
-    const string str01(literal);
-    string str02;
-
-    str02 = str01.substr(0, 5);
-    EXPECT_TRUE(str02 == "basem");
-
-    str02 = str01.substr(0, 8);
-    EXPECT_TRUE(str02 == "basement");
-
-    str02 = str01.substr(0, string::npos);
-    EXPECT_TRUE(str02 == "basement jaxx");
-
-    str02 = str01.substr();
-    EXPECT_TRUE(str02 == "basement jaxx");
-
-    str02 = str01.substr(9);
-    EXPECT_TRUE(str02 == "jaxx");
-
-    str02 = str01.substr(9, string::npos);
-    EXPECT_TRUE(str02 == "jaxx");
-    return true;
-}
-
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -926,6 +891,5 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testCapacity);
     FAIL_UNLESS(testClear);
     FAIL_UNLESS(testErase);
-    FAIL_UNLESS(testSubstr);
     return kPassed;
 }

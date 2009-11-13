@@ -136,6 +136,12 @@ void string::ConstructEmptyString()
     mCapacity = 0;
 }
 
+void string::Constructor(const value_type *str, size_type n)
+{
+    Constructor(str, 0, n);
+}
+
+
 void string::Constructor(const value_type *str, size_type pos, size_type n)
 {
     // Enough data and no overflow
@@ -168,29 +174,40 @@ string::string()
     ConstructEmptyString();
 }
 
+string::string(const string& str)
+{
+    Constructor(str.mData, str.mLength);
+}
+
 string::string(const string& str, size_type pos, size_type n)
+{
+    if (pos < str.mLength && n <= (str.mLength - pos))
+    {
+        Constructor(str.mData + pos , n);
+    }
+    else
+    {
+        ConstructEmptyString();
+    }
+}
+
+string::string(const string& str, size_type pos)
 {
     if (pos < str.mLength)
     {
-        if (npos == n)
-        {
-            Constructor(str.mData, pos , str.mLength - pos);
-            return;
-        }
-        else if (n <= (str.mLength - pos))
-        {
-            Constructor(str.mData, pos , n);
-            return;
-        }
+        Constructor(str.mData, pos, str.mLength - pos);
     }
-    ConstructEmptyString();
+    else
+    {
+        ConstructEmptyString();
+    }
 }
 
 string::string(const value_type *str)
 {
     if (NULL != str)
     {
-        Constructor(str, 0, strlen(str));
+        Constructor(str, strlen(str));
     }
     else
     {
@@ -200,14 +217,7 @@ string::string(const value_type *str)
 
 string::string(const value_type *str, size_type n)
 {
-    if (npos != n)
-    {
-        Constructor(str, 0, n);
-    }
-    else
-    {
-        ConstructEmptyString();  // standard requires we throw length_error here.
-    }
+    Constructor(str, n);
 }
 
 // Char repeat constructor.
@@ -220,7 +230,7 @@ string::string(const value_type *begin, const value_type *end)
 {
     if (begin < end)
     {
-        Constructor(begin, 0, end - begin);
+        Constructor(begin, end - begin);
     }
     else
     {
@@ -445,7 +455,7 @@ char& string::operator[](const size_type pos)
 string& string::assign(const string& str)
 {
     clear();
-    Constructor(str.mData, 0, str.mLength);
+    Constructor(str.mData, str.mLength);
     return *this;
 }
 
@@ -470,7 +480,7 @@ string& string::assign(const value_type *str)
         return *this;
     }
     clear();
-    Constructor(str, 0, strlen(str));
+    Constructor(str, strlen(str));
     return *this;
 }
 
@@ -481,7 +491,7 @@ string& string::assign(const value_type *array, size_type n)
         return *this;
     }
     clear();
-    Constructor(array, 0, n);
+    Constructor(array, n);
     return *this;
 }
 
@@ -519,7 +529,10 @@ string::size_type string::find(const value_type *str, size_type pos) const
     {
         return string::npos;
     }
-    return static_cast<size_type>(idx - mData);
+
+    const std::ptrdiff_t delta = idx - mData;
+
+    return static_cast<size_type>(delta);
 }
 
 }  // namespace std
