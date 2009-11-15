@@ -62,9 +62,10 @@ endef
 
 sources := \
     test_algorithm.cpp \
+    test_functional.cpp \
     test_string.cpp \
     test_type_traits.cpp \
-	test_uninitialized.cpp \
+    test_uninitialized.cpp \
     test_vector.cpp
 
 # Disable all optimization for the host target to help test tools (valgrind...)
