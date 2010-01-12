@@ -63,6 +63,7 @@ endef
 sources := \
     test_algorithm.cpp \
     test_functional.cpp \
+    test_limits.cpp \
     test_string.cpp \
     test_type_traits.cpp \
     test_uninitialized.cpp \

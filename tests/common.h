@@ -44,6 +44,9 @@ const int kFailed = 1;
         return false;                                       \
     }
 
+#define EXPECT_FALSE(expr) EXPECT_TRUE(!(expr))
+
+
 #ifndef ARRAYSIZE
 #define ARRAYSIZE(array) (sizeof(array)/sizeof(array[0]))
 #endif
