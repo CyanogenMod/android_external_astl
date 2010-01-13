@@ -867,6 +867,31 @@ bool testErase()
   return true;
 }
 
+// Checks an iterator can be cast to a const one.
+bool testConstIterator()
+{
+    string s("a string");
+    string::iterator i = s.begin();
+    string::const_iterator ci = s.begin();
+    return true;
+}
+
+bool testForwardIterator()
+{
+    string s("a string");
+    char chars[] = "a string";
+    string::iterator iter = s.begin();
+    for (int i = 0; iter != s.end(); ++i) {
+        EXPECT_TRUE(*iter == chars[i]);
+        ++iter;
+    }
+    EXPECT_TRUE(iter == s.end());
+
+    string empty;
+    EXPECT_TRUE(empty.begin() == empty.end());
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -891,5 +916,7 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testCapacity);
     FAIL_UNLESS(testClear);
     FAIL_UNLESS(testErase);
+    FAIL_UNLESS(testConstIterator);
+    FAIL_UNLESS(testForwardIterator);
     return kPassed;
 }
