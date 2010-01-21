@@ -34,6 +34,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+#include <iterator>
 #include <memory>
 #include <type_traits.h>
 
@@ -58,6 +59,8 @@ namespace std {
 template<typename _T>
 class vector
 {
+    typedef vector<_T> vector_type;
+
   public:
     typedef _T         value_type;
     typedef _T*        pointer;
@@ -65,8 +68,8 @@ class vector
     typedef _T&        reference;
     typedef const _T&  const_reference;
 
-    typedef pointer iterator;
-    typedef const_pointer const_iterator;
+    typedef __wrapper_iterator<pointer,vector_type>  iterator;
+    typedef __wrapper_iterator<const_pointer,vector_type> const_iterator;
 
     typedef size_t    size_type;
     typedef ptrdiff_t difference_type;
@@ -112,13 +115,11 @@ class vector
     // @return A reference to the element.
     reference operator[](size_type index) { return *(mBegin + index); }
 
-    // We don't have iterator, use pointers for now.  begin and end
-    // return NULL if the vector has been cleared or not initialized.
-    iterator begin() { return mBegin; }
-    iterator end() { return mBegin + mLength; }
+    iterator begin() { return iterator(mBegin); }
+    iterator end() { return iterator(mBegin + mLength); }
 
-    const_iterator begin() const { return mBegin; }
-    const_iterator end() const { return mBegin + mLength; }
+    const_iterator begin() const { return const_iterator(mBegin); }
+    const_iterator end() const { return const_iterator(mBegin + mLength); }
 
     // Add data at the end of the vector. Constant in time if the
     // memory has been preallocated (e.g using reserve).

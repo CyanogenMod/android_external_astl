@@ -165,27 +165,43 @@ class __wrapper_iterator
 // Forward iterator requirements
 template<typename _IteratorL, typename _IteratorR, typename _Container>
 inline bool
-operator==(const __wrapper_iterator<_IteratorL, _Container>& __lhs,
-	       const __wrapper_iterator<_IteratorR, _Container>& __rhs)
-{ return __lhs.base() == __rhs.base(); }
+operator==(const __wrapper_iterator<_IteratorL, _Container>& lhs,
+	       const __wrapper_iterator<_IteratorR, _Container>& rhs)
+{ return lhs.base() == rhs.base(); }
 
 template<typename _Iterator, typename _Container>
 inline bool
-operator==(const __wrapper_iterator<_Iterator, _Container>& __lhs,
-	       const __wrapper_iterator<_Iterator, _Container>& __rhs)
-{ return __lhs.base() == __rhs.base(); }
+operator==(const __wrapper_iterator<_Iterator, _Container>& lhs,
+	       const __wrapper_iterator<_Iterator, _Container>& rhs)
+{ return lhs.base() == rhs.base(); }
 
 template<typename _IteratorL, typename _IteratorR, typename _Container>
 inline bool
-operator!=(const __wrapper_iterator<_IteratorL, _Container>& __lhs,
-	       const __wrapper_iterator<_IteratorR, _Container>& __rhs)
-{ return __lhs.base() != __rhs.base(); }
+operator!=(const __wrapper_iterator<_IteratorL, _Container>& lhs,
+	       const __wrapper_iterator<_IteratorR, _Container>& rhs)
+{ return lhs.base() != rhs.base(); }
 
 template<typename _Iterator, typename _Container>
 inline bool
-operator!=(const __wrapper_iterator<_Iterator, _Container>& __lhs,
-	       const __wrapper_iterator<_Iterator, _Container>& __rhs)
-{ return __lhs.base() != __rhs.base(); }
+operator!=(const __wrapper_iterator<_Iterator, _Container>& lhs,
+	       const __wrapper_iterator<_Iterator, _Container>& rhs)
+{ return lhs.base() != rhs.base(); }
+
+// operator+ so we support 100 + iterator<>.
+template<typename _Iterator, typename _Container>
+inline __wrapper_iterator<_Iterator, _Container>
+operator+(typename __wrapper_iterator<_Iterator, _Container>::difference_type n,
+	      const __wrapper_iterator<_Iterator, _Container>& i)
+{ return __wrapper_iterator<_Iterator, _Container>(i.base() + n); }
+
+// operator- : diff is supported on iterators.
+
+template<typename _Iterator, typename _Container>
+inline typename __wrapper_iterator<_Iterator, _Container>::difference_type
+operator-(const __wrapper_iterator<_Iterator, _Container>& lhs,
+	      const __wrapper_iterator<_Iterator, _Container>& rhs)
+{ return lhs.base() - rhs.base(); }
+
 
 }  // namespace std
 

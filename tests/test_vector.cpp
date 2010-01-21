@@ -78,7 +78,6 @@ bool testConstructorRepeat()
     {
         const vector<int> vec1(100, 10);
 
-        EXPECT_TRUE(vec1.end() - vec1.begin() == 100);
         for (int i = 0; i < 100; ++i)
         {
             EXPECT_TRUE(vec1[i] == 10);
@@ -239,7 +238,7 @@ bool testPopBack()
     EXPECT_TRUE(vec1.size() == 0);
     EXPECT_TRUE(vec1.capacity() == 0);
     EXPECT_TRUE(vec1.begin() == vec1.end());
-    EXPECT_TRUE(vec1.begin() == NULL);
+    EXPECT_TRUE(vec1.begin().base() == NULL);
 
     CtorDtorCounter instance;
     vector<CtorDtorCounter> vec2(10, instance);
@@ -293,6 +292,28 @@ bool testIterators()
     for (int c = 0; j != vec1.end(); ++j, ++c)
     {
         EXPECT_TRUE(c == *j);
+    }
+
+    {
+        const vector<int> vec1(100, 10);
+
+        EXPECT_TRUE(vec1.end().operator-(100) == vec1.begin());
+        EXPECT_TRUE(vec1.end() - 100 == vec1.begin());
+
+        EXPECT_TRUE(100 + vec1.begin() == vec1.end());
+        EXPECT_TRUE(vec1.begin() + 100 == vec1.end());
+
+        EXPECT_TRUE(vec1.end() - vec1.begin() == 100);
+
+        for (vector<int>::const_iterator i = vec1.begin();
+             i != vec1.end(); ++i) {
+            EXPECT_TRUE(*i == 10);
+        }
+    }
+
+    {
+        const vector<int> vec2;
+        EXPECT_TRUE(vec2.begin() == vec2.end());
     }
     return true;
 }
