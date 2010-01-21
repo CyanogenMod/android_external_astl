@@ -205,7 +205,8 @@ bool vector<_T>::reserve(size_type new_size)
     if (is_pod<value_type>::value)
     {
         pointer oldBegin = mBegin;
-        mBegin = static_cast<pointer>(realloc(mBegin, new_size * sizeof(value_type)));
+        mBegin = static_cast<pointer>(
+            realloc(mBegin, new_size * sizeof(value_type)));
         if (!mBegin)
         {
             mBegin = oldBegin;
@@ -214,11 +215,14 @@ bool vector<_T>::reserve(size_type new_size)
     }
     else
     {
-        pointer newBegin =  static_cast<pointer>(malloc(new_size * sizeof(value_type)));
+        pointer newBegin =  static_cast<pointer>(
+            malloc(new_size * sizeof(value_type)));
         if (!newBegin) return false;
 
-        std::uninitialized_copy(mBegin, mBegin + mLength, newBegin);
-        if (mBegin) deallocate();
+        if (mBegin != NULL) {
+            std::uninitialized_copy(mBegin, mBegin + mLength, newBegin);
+            deallocate();
+        }
         mBegin = newBegin;
     }
     mCapacity = new_size;
@@ -235,7 +239,13 @@ void vector<_T>::push_back(const value_type& elt)
         if (0 == new_capacity || !reserve(new_capacity)) return;
     }
     // mLength < mCapacity
-    *(mBegin + mLength) = elt;
+    if (is_pod<value_type>::value) {
+        *(mBegin + mLength) = elt;
+    } else {
+        // The memory where the new element is added is uninitialized,
+        // we cannot use assigment (lhs is not valid).
+        new((void *)(mBegin + mLength)) _T(elt);
+    }
     ++mLength;
 }
 

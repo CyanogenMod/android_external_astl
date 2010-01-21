@@ -32,9 +32,11 @@
 #endif
 #include <climits>
 #include <cstring>
+#include <string>
 #include "common.h"
 
 namespace android {
+using std::string;
 using std::vector;
 static const size_t kExponentialFactor = 2;
 bool testConstructorInt()
@@ -64,6 +66,17 @@ bool testConstructorInt()
         {
             EXPECT_TRUE(vec3[i] == 0xaa);
         }
+    }
+    return true;
+}
+
+bool testConstructorString()
+{
+    {
+        vector<string> vec1;
+        EXPECT_TRUE(vec1.empty());
+        EXPECT_TRUE(vec1.size() == 0);
+        EXPECT_TRUE(vec1.capacity() == 0);
     }
     return true;
 }
@@ -163,7 +176,7 @@ bool testReserve()
         c.mCount = 0;
         vector<CopyCounter> vec4(100, c);
         EXPECT_TRUE(c.mCount == 100);
-        // Resizing does not do any copy via the copy assignement op.
+        // Growing does not do any copy via the copy assignement op.
         vec4.reserve(1000);
         EXPECT_TRUE(c.mCount == 200);
         vec4.reserve(50); // reserving less than length is a nop.
@@ -192,10 +205,11 @@ bool testPushBack()
         }
         EXPECT_TRUE(vec1.capacity() == 1024);
         EXPECT_TRUE(vec1.size() == 1000);
-        EXPECT_TRUE(c.mAssignCount == 1000);
-        // Due to the multiple augmentation of the capacity, the copy
-        // constructor has been invoked.
-        EXPECT_TRUE(c.mCopyCtorCount > 0);
+        // Assignment should not be used, but the constructor should.
+        EXPECT_TRUE(c.mAssignCount == 0);
+        // Copy constructor was been invoked for each new element
+        // pushed and when the capacity was increased.
+        EXPECT_TRUE(c.mCopyCtorCount > 1000);
         EXPECT_TRUE(c.mCtorCount == 0);
     }
     {
@@ -209,6 +223,16 @@ bool testPushBack()
         EXPECT_TRUE(vec2.front() == 10);
         EXPECT_TRUE(vec2.back() == 20);
         EXPECT_TRUE(vec2.size() == 2);
+    }
+    // Push back an non-pod object.
+    {
+        string str = "a string";
+        vector<string> vec3;
+
+        vec3.push_back(str);
+        EXPECT_TRUE(vec3.size() == 1);
+        EXPECT_TRUE(vec3.front() == "a string");
+        EXPECT_TRUE(vec3.back() == "a string");
     }
     return true;
 }
@@ -362,6 +386,7 @@ bool testCtorDtorForNonPod()
 int main(int argc, char **argv)
 {
     FAIL_UNLESS(testConstructorInt);
+    FAIL_UNLESS(testConstructorString);
     FAIL_UNLESS(testConstructorRepeat);
     FAIL_UNLESS(testReserve);
     FAIL_UNLESS(testPushBack);
