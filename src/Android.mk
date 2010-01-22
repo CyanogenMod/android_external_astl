@@ -19,6 +19,7 @@
 LOCAL_PATH := $(call my-dir)
 
 astl_common_src_files := \
+    ios_pos_types.cpp \
     string.cpp
 
 # Build the target lib

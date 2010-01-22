@@ -30,6 +30,7 @@
 #ifndef ANDROID_ASTL_LIMITS__
 #define ANDROID_ASTL_LIMITS__
 
+#include <limits.h>
 // GNU C++ compiler?
 #ifndef __GNUG__
 #error "__GNUG__ is not defined"
@@ -41,6 +42,26 @@
 
 // This is very incomplete partial implementation of the standard
 // <limits>. Only partial support for float and double is provided.
+
+namespace {
+// Template to return the number of decimal digits in a number
+// representation based on the number of bits and sign.
+// e.g  digits10<int,64,true>::value == 19
+template<typename T, T bits, bool is_signed> struct digits10 {
+    static const int value = 0;
+};
+
+// Specialization that can be used to initialize static constant at
+// compile time.
+template<> struct digits10<int,  8, false> { static const int value = 3; };
+template<> struct digits10<int,  8, true>  { static const int value = 3; };
+template<> struct digits10<int, 16, false> { static const int value = 5; };
+template<> struct digits10<int, 16, true>  { static const int value = 5; };
+template<> struct digits10<int, 32, false> { static const int value = 10; };
+template<> struct digits10<int, 32, true>  { static const int value = 10; };
+template<> struct digits10<int, 64, false> { static const int value = 20; };
+template<> struct digits10<int, 64, true>  { static const int value = 19; };
+}
 
 namespace std {
 
@@ -111,6 +132,38 @@ struct numeric_limits<double>
 
     static const int digits = __DBL_MANT_DIG__;
     static const int digits10 = __DBL_DIG__;
+};
+
+// numeric_limits<long>
+template<>
+struct numeric_limits<long>
+{
+    static const bool is_specialized = true;
+
+    static long min() { return LONG_MIN; }
+    static long max() { return LONG_MAX; }
+
+    static const bool is_signed = true;
+    static const bool is_integer = true;
+
+    static const int digits = LONG_BIT;
+    static const int digits10 = digits10<int, digits, is_signed>::value;
+};
+
+// numeric_limits<long long>
+template<>
+struct numeric_limits<long long>
+{
+    static const bool is_specialized = true;
+
+    static long long min() { return LLONG_MIN; }
+    static long long max() { return LLONG_MAX; }
+
+    static const bool is_signed = true;
+    static const bool is_integer = true;
+
+    static const int digits = ((int)(sizeof(long long) * CHAR_BIT));
+    static const int digits10 = digits10<int, digits, is_signed>::value;
 };
 
 }  // namespace std

@@ -63,6 +63,7 @@ endef
 sources := \
     test_algorithm.cpp \
     test_functional.cpp \
+    test_ios_pos_types.cpp \
     test_limits.cpp \
     test_set.cpp \
     test_string.cpp \

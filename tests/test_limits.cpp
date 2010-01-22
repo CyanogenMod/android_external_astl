@@ -39,6 +39,8 @@ bool testSpecialized()
 {
     EXPECT_TRUE(std::numeric_limits<float>::is_specialized);
     EXPECT_TRUE(std::numeric_limits<double>::is_specialized);
+    EXPECT_TRUE(std::numeric_limits<long>::is_specialized);
+    EXPECT_TRUE(std::numeric_limits<long long>::is_specialized);
     return true;
 }
 
@@ -46,6 +48,7 @@ bool testMin()
 {
     EXPECT_TRUE(std::numeric_limits<float>::min() == __FLT_MIN__);
     EXPECT_TRUE(std::numeric_limits<double>::min() == __DBL_MIN__);
+    EXPECT_TRUE(std::numeric_limits<long>::min() == LONG_MIN);
     return true;
 }
 
@@ -53,6 +56,8 @@ bool testMax()
 {
     EXPECT_TRUE(std::numeric_limits<float>::max() == __FLT_MAX__);
     EXPECT_TRUE(std::numeric_limits<double>::max() == __DBL_MAX__);
+    EXPECT_TRUE(std::numeric_limits<long>::max() == LONG_MAX);
+    EXPECT_TRUE(std::numeric_limits<long long>::max() == LLONG_MAX);
     return true;
 }
 
@@ -60,6 +65,8 @@ bool testSigned()
 {
     EXPECT_TRUE(std::numeric_limits<float>::is_signed);
     EXPECT_TRUE(std::numeric_limits<double>::is_signed);
+    EXPECT_TRUE(std::numeric_limits<long>::is_signed);
+    EXPECT_TRUE(std::numeric_limits<long long>::is_signed);
     return true;
 }
 
@@ -67,6 +74,17 @@ bool testIsInteger()
 {
     EXPECT_FALSE(std::numeric_limits<float>::is_integer);
     EXPECT_FALSE(std::numeric_limits<double>::is_integer);
+    EXPECT_TRUE(std::numeric_limits<long>::is_integer);
+    EXPECT_TRUE(std::numeric_limits<long long>::is_integer);
+    return true;
+}
+
+bool testDigits()
+{
+    EXPECT_TRUE(std::numeric_limits<long>::digits == 32);
+    EXPECT_TRUE(std::numeric_limits<long>::digits10 == 10);
+    EXPECT_TRUE(std::numeric_limits<long long>::digits == 64);
+    EXPECT_TRUE(std::numeric_limits<long long>::digits10 == 19);
     return true;
 }
 
@@ -79,5 +97,6 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testMax);
     FAIL_UNLESS(testSigned);
     FAIL_UNLESS(testIsInteger);
+    FAIL_UNLESS(testDigits);
     return kPassed;
 }
