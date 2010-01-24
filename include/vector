@@ -81,6 +81,22 @@ class vector
     // @param init_value The element to copy.
     explicit vector(const size_type num, const value_type& init_value = value_type());
 
+    // Create a vector by copying the elements from [first, last).
+    //
+    // If the iterators are random-access, the constructor will be
+    // able to reserve the memory in a single call before copying the
+    // elements. If the elements are POD, the constructor uses memmove.
+    template<typename _Iterator>
+    vector(_Iterator first, _Iterator last) {
+        // Because of template matching, vector<int>(int n, int val)
+        // will now match this constructor (int != size_type) instead
+        // of the repeat one above. In this case, the _Iterator
+        // template parameter is an integral type and not an iterator,
+        // we use that to call the correct initialize impl.
+        typedef typename is_integral<_Iterator>::type integral;
+        initialize(first, last, integral());
+    }
+
     ~vector() { clear(); }
 
     // @return true if the vector is empty, false otherwise.
@@ -137,6 +153,39 @@ class vector
 
     void swap(vector& other);
   private:
+    // See the 2 'initialize' methods first. They desambiguate between
+    // repeat and range initialize. For range initialize, there is
+    // another desambiguation based on the nature of the iterators.
+
+    // Repeat constructor implementation.
+    void repeat_initialize(const size_type num,
+                           const value_type& init_value);
+
+    // Initialize from a random access iterator.
+    template<typename _Iterator>
+    void range_initialize(_Iterator first, _Iterator last,
+                          random_access_iterator_tag);
+
+    // Initialize from an input iterator.
+    template<typename _InputIterator>
+    void range_initialize(_InputIterator first, _InputIterator last,
+                          input_iterator_tag);
+
+    // Repeat constructor that matched the templatized constructor for iterator.
+    // The last parameter true_type is used by the caller to target this method.
+    template<typename _Integral>
+    void initialize(_Integral num, _Integral init_value, true_type) {
+        repeat_initialize((size_type)num, init_value);
+    }
+
+    // Not a repeat constructor (last param type is false_type). first
+    // and last are really iterators. Dispatch the call depending on
+    // the iterators' category.
+    template<typename _InputIterator>
+    void initialize(_InputIterator first, _InputIterator last, false_type) {
+        range_initialize(first, last, android::iterator_category(first));
+    }
+
     // @return New internal buffer size when it is adjusted automatically.
     size_type grow() const;
 
@@ -170,6 +219,13 @@ vector<_T>::vector()
 
 template<typename _T>
 vector<_T>::vector(const size_type num, const value_type& init_value)
+{
+    repeat_initialize(num, init_value);
+}
+
+template<typename _T>
+void vector<_T>::repeat_initialize(const size_type num,
+                                   const value_type& init_value)
 {
     if (num < max_size())
     {
@@ -288,6 +344,39 @@ void vector<_T>::swap(vector& other)
     std::swap(mCapacity, other.mCapacity);
     std::swap(mLength, other.mLength);
 }
+
+template<typename _T>
+template<typename _InputIterator>
+void vector<_T>::range_initialize(_InputIterator first, _InputIterator last,
+                                  input_iterator_tag) {
+    // There is no way to know how many elements we are going to
+    // insert, call push_back which will alloc/realloc as needed.
+    mBegin = NULL;
+    mLength = mCapacity =  0;
+    for (; first != last; ++first) {
+        push_back(*first);
+    }
+}
+
+template<typename _T>
+template<typename _Iterator>
+void vector<_T>::range_initialize(_Iterator first, _Iterator last,
+                                  random_access_iterator_tag) {
+    typedef typename iterator_traits<_Iterator>::difference_type difference_type;
+    const difference_type num = std::distance(first, last);
+
+    if (0 <= num && static_cast<size_type>(num) < max_size()) {
+        mBegin = static_cast<pointer>(malloc(num * sizeof(value_type)));
+        if (mBegin) {
+            mLength = mCapacity =  num;
+            std::uninitialized_copy(first, last, iterator(mBegin));
+            return;
+        }
+    }
+    mBegin = NULL;
+    mLength = mCapacity =  0;
+}
+
 
 // Grow the capacity. Use exponential until kExponentialLimit then
 // linear until it reaches max_size().

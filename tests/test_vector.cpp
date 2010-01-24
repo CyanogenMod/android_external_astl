@@ -122,6 +122,44 @@ bool testConstructorRepeat()
     return true;
 }
 
+bool testConstructorIterator()
+{
+    {
+        vector<string> src;
+        EXPECT_TRUE(src.empty());
+        vector<string> dst(src.begin(), src.end());
+        EXPECT_TRUE(dst.empty());
+    }
+    {
+        vector<int> src;
+        EXPECT_TRUE(src.empty());
+        vector<int> dst(src.begin(), src.end());
+        EXPECT_TRUE(dst.empty());
+    }
+    {
+        vector<int> src;
+        src.push_back(10);
+        src.push_back(20);
+        src.push_back(30);
+        vector<int> dst(src.begin(), src.end());
+        EXPECT_TRUE(dst.size() == 3);
+        EXPECT_TRUE(dst[0] == 10);
+        EXPECT_TRUE(dst[1] == 20);
+        EXPECT_TRUE(dst[2] == 30);
+    }
+    {
+        vector<string> src;
+        src.push_back("str1");
+        src.push_back("str2");
+        src.push_back("str3");
+        vector<string> dst(src.begin(), src.end());
+        EXPECT_TRUE(dst.size() == 3);
+        EXPECT_TRUE(dst[0] == "str1");
+        EXPECT_TRUE(dst[1] == "str2");
+        EXPECT_TRUE(dst[2] == "str3");
+    }
+    return true;
+}
 
 bool testReserve()
 {
@@ -390,6 +428,7 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testConstructorInt);
     FAIL_UNLESS(testConstructorString);
     FAIL_UNLESS(testConstructorRepeat);
+    FAIL_UNLESS(testConstructorIterator);
     FAIL_UNLESS(testReserve);
     FAIL_UNLESS(testPushBack);
     FAIL_UNLESS(testPopBack);
