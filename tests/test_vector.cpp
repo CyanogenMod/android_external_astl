@@ -328,6 +328,8 @@ bool testIterators()
         EXPECT_TRUE(vec1.begin() + 100 == vec1.end());
 
         EXPECT_TRUE(vec1.end() - vec1.begin() == 100);
+        EXPECT_TRUE(std::distance(vec1.begin(), vec1.end()) == 100);
+        EXPECT_TRUE(std::distance(vec1.end(), vec1.begin()) == -100);
 
         for (vector<int>::const_iterator i = vec1.begin();
              i != vec1.end(); ++i) {
