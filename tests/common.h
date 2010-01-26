@@ -79,6 +79,10 @@ class CtorDtorCounter {
     CtorDtorCounter& operator=(const CtorDtorCounter& nc) {++mAssignCount; return *this;}
     ~CtorDtorCounter() {++mDtorCount;}
     static void reset() {mCtorCount = 0; mCopyCtorCount = 0; mAssignCount = 0; mDtorCount = 0;}
+    static void printf() {
+        std::fprintf(stderr, "CtorDtorCounter: %d %d %d %d\n",
+                     mCtorCount, mCopyCtorCount, mAssignCount, mDtorCount);
+    }
   private:
 };
 

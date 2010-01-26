@@ -134,6 +134,38 @@ struct numeric_limits<double>
     static const int digits10 = __DBL_DIG__;
 };
 
+// numeric_limits<int>
+template<>
+struct numeric_limits<int>
+{
+    static const bool is_specialized = true;
+
+    static int min() { return INT_MIN; }
+    static int max() { return INT_MAX; }
+
+    static const bool is_signed = true;
+    static const bool is_integer = true;
+
+    static const int digits = static_cast<int>(sizeof(int) * CHAR_BIT);
+    static const int digits10 = digits10<int, digits, is_signed>::value;
+};
+
+// numeric_limits<unsigned int>
+template<>
+struct numeric_limits<unsigned int>
+{
+    static const bool is_specialized = true;
+
+    static unsigned int min() { return 0; }
+    static unsigned int max() { return UINT_MAX; }
+
+    static const bool is_signed = false;
+    static const bool is_integer = true;
+
+    static const int digits = static_cast<int>(sizeof(unsigned int) * CHAR_BIT);
+    static const int digits10 = digits10<int, digits, is_signed>::value;
+};
+
 // numeric_limits<long>
 template<>
 struct numeric_limits<long>
@@ -162,7 +194,7 @@ struct numeric_limits<long long>
     static const bool is_signed = true;
     static const bool is_integer = true;
 
-    static const int digits = ((int)(sizeof(long long) * CHAR_BIT));
+    static const int digits = static_cast<int>(sizeof(long long) * CHAR_BIT);
     static const int digits10 = digits10<int, digits, is_signed>::value;
 };
 

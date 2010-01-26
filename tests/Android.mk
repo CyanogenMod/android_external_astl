@@ -61,17 +61,18 @@ define host-test
 endef
 
 sources := \
-    test_algorithm.cpp \
-    test_functional.cpp \
-    test_ios_base.cpp \
-    test_ios_pos_types.cpp \
-    test_iterator.cpp \
-    test_limits.cpp \
-    test_set.cpp \
-    test_string.cpp \
-    test_type_traits.cpp \
-    test_uninitialized.cpp \
-    test_vector.cpp
+   test_algorithm.cpp \
+   test_functional.cpp \
+   test_ios_base.cpp \
+   test_ios_pos_types.cpp \
+   test_iterator.cpp \
+   test_limits.cpp \
+   test_memory.cpp \
+   test_set.cpp \
+   test_string.cpp \
+   test_type_traits.cpp \
+   test_uninitialized.cpp \
+   test_vector.cpp
 
 # Disable all optimization for the host target to help test tools (valgrind...)
 EXTRA_CFLAGS := -I bionic/libstdc++/include -I external/astl/include -g -O0

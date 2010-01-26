@@ -42,13 +42,21 @@ using std::uninitialized_fill;
 
 bool testCopyPod()
 {
-    int src[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-    const int size = ARRAYSIZE(src);
-    int dest[size] = {0, };
+    {
+        int src[0];
+        const int size = ARRAYSIZE(src);
+        int dest[10] = {0, };
+        EXPECT_TRUE(uninitialized_copy(src, src + size, dest) == dest);
+    }
+    {
+        int src[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        const int size = ARRAYSIZE(src);
+        int dest[size] = {0, };
 
-    EXPECT_TRUE(uninitialized_copy(src, src + size, dest) == dest);
+        EXPECT_TRUE(uninitialized_copy(src, src + size, dest) == dest + size);
 
-    EXPECT_TRUE(std::equal(src, src + size, dest));
+        EXPECT_TRUE(std::equal(src, src + size, dest));
+    }
     return true;
 }
 
@@ -58,7 +66,9 @@ bool testCopyPodOverflow()
     int src, dest;
 
     // Should not crash
-    EXPECT_TRUE(uninitialized_copy(&src, &src + kMaxSizeT / sizeof(src) + 1, &dest) == &dest);
+    EXPECT_TRUE(
+        uninitialized_copy(&src, &src + kMaxSizeT / sizeof(src) + 1, &dest) ==
+        &dest);
     return true;
 }
 
@@ -68,7 +78,8 @@ bool testCopyClass()
     CtorDtorCounter::reset();
 
     CtorDtorCounter src[kSize];
-    CtorDtorCounter *dest = static_cast<CtorDtorCounter*>(malloc(kSize * sizeof(CtorDtorCounter)));
+    CtorDtorCounter *dest = static_cast<CtorDtorCounter*>(
+        malloc(kSize * sizeof(CtorDtorCounter)));
 
     EXPECT_TRUE(CtorDtorCounter::mCtorCount == kSize);
     EXPECT_TRUE(CtorDtorCounter::mCopyCtorCount == 0);
@@ -76,7 +87,7 @@ bool testCopyClass()
 
     CtorDtorCounter::reset();
 
-    EXPECT_TRUE(uninitialized_copy(src, src + kSize, dest) == dest);
+    EXPECT_TRUE(uninitialized_copy(src, src + kSize, dest) == dest + kSize);
 
     EXPECT_TRUE(CtorDtorCounter::mCtorCount == 0);
     EXPECT_TRUE(CtorDtorCounter::mCopyCtorCount == kSize);
@@ -89,24 +100,31 @@ struct A {};
 bool testCopyArray()
 {
     {
+        A src[0];
+        A one;
+        A *dest = &one;
+        // Empty, dest should not have moved.
+        EXPECT_TRUE(uninitialized_copy(src, src, dest) == dest);
+    }
+    {
         const A src[] = {A()};
         A one;
         A *dest = &one;
 
-        EXPECT_TRUE(uninitialized_copy(src, src + 1, dest) == dest);
+        EXPECT_TRUE(uninitialized_copy(src, src + 1, dest) == dest + 1);
     }
     {
         A src[] = {A()};
         A one;
         A *dest = &one;
 
-        EXPECT_TRUE(uninitialized_copy(src, src + 1, dest) == dest);
+        EXPECT_TRUE(uninitialized_copy(src, src + 1, dest) == dest + 1);
     }
     {
         const A src[] = {A()};
         A dest[1];
 
-        EXPECT_TRUE(uninitialized_copy(src, src + 1, dest) == dest);
+        EXPECT_TRUE(uninitialized_copy(src, src + 1, dest) == dest + 1);
     }
     return true;
 }
@@ -141,7 +159,8 @@ bool testFillClass()
     CtorDtorCounter::reset();
 
     CtorDtorCounter src;
-    CtorDtorCounter *dest = static_cast<CtorDtorCounter*>(malloc(kSize * sizeof(CtorDtorCounter)));
+    CtorDtorCounter *dest = static_cast<CtorDtorCounter*>(
+        malloc(kSize * sizeof(CtorDtorCounter)));
 
     EXPECT_TRUE(CtorDtorCounter::mCtorCount == 1);
     EXPECT_TRUE(CtorDtorCounter::mCopyCtorCount == 0);
