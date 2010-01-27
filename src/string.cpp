@@ -207,7 +207,7 @@ string::string(const value_type *str)
 {
     if (NULL != str)
     {
-        Constructor(str, strlen(str));
+        Constructor(str, traits_type::length(str));
     }
     else
     {
@@ -301,7 +301,7 @@ string& string::append(const value_type *str)
 {
     if (NULL != str)
     {
-        Append(str, strlen(str));
+        Append(str, traits_type::length(str));
     }
     return *this;
 }
@@ -379,22 +379,16 @@ int string::compare(const value_type *other) const
 
 bool operator==(const string& left, const string& right)
 {
-    if (&left == &right)
-    {
+    if (&left == &right) {
         return true;
     }
-    else
-    {
-        // We can use strcmp here because even when the string is build from an
-        // array of char we insert the terminating '\0'.
-        return strcmp(left.mData, right.mData) == 0;
-    }
+    return (left.size() == right.size() &&
+            !char_traits::compare(left.mData, right.mData, left.size()));
 }
 
 bool operator==(const string& left, const string::value_type *right)
 {
-    if (NULL == right)
-    {
+    if (NULL == right) {
         return false;
     }
     // We can use strcmp here because even when the string is build from an
@@ -480,7 +474,7 @@ string& string::assign(const value_type *str)
         return *this;
     }
     clear();
-    Constructor(str, strlen(str));
+    Constructor(str, traits_type::length(str));
     return *this;
 }
 

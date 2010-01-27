@@ -32,6 +32,7 @@
 
 #include <cstddef>
 #include <iterator>
+#include <char_traits.h>
 
 namespace std {
 
@@ -54,13 +55,14 @@ namespace std {
 class string
 {
   public:
-    typedef size_t            size_type;
-    typedef char              value_type;
-    typedef ptrdiff_t         difference_type;
-    typedef value_type&       reference;
-    typedef const value_type& const_reference;
-    typedef value_type*       pointer;
-    typedef const value_type* const_pointer;
+    typedef char_traits            traits_type;
+    typedef traits_type::char_type value_type;
+    typedef size_t                 size_type;
+    typedef ptrdiff_t              difference_type;
+    typedef value_type&            reference;
+    typedef const value_type&      const_reference;
+    typedef value_type*            pointer;
+    typedef const value_type*      const_pointer;
     typedef __wrapper_iterator<pointer,string>  iterator;
     typedef __wrapper_iterator<const_pointer,string> const_iterator;
 
