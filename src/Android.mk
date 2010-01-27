@@ -22,6 +22,7 @@ astl_common_src_files := \
     ios_base.cpp \
     ios_pos_types.cpp \
     ostream.cpp \
+    streambuf.cpp \
     string.cpp
 
 # Build the target lib
