@@ -27,52 +27,49 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ANDROID_ASTL_OSTREAM__
-#define ANDROID_ASTL_OSTREAM__
-
-#include <ios_base.h>
-#include <ios_pos_types.h>
-
-namespace std {
-
-/**
- * Basic implementation of ostream. The STL standard defines a
- * basic_ostream template that gets specialized for char and
- * wchar. Since Android supports only char, we don't use a template
- * here.
- */
-class streambuf;
-class ostream: public ios_base
-{
-  public:
-    typedef char           char_type;
-    typedef int            int_type;
-    typedef streampos      pos_type;
-    typedef streamoff      off_type;
-
-  protected:
-    ostream();
-
-  public:
-    // TODO: implement.
-    ostream(streambuf *sb) {}
-    virtual ~ostream();
-
-    // Synchronize the stream buffer.
-    // TODO: implement.
-    ostream& flush() { return *this; }
-
-    /**
-     * Interface for manipulators (e.g std::endl, std::hex in
-     * expression like "std::cout << std::endl"). See iomanip header.
-     */
-    ostream& operator<<(ostream& (*manip)(ostream&)) { return manip(*this); }
-    ostream& operator<<(ios_base& (*manip)(ios_base&)) {
-        manip(*this);
-        return *this;
-    }
-};
-
-}  // namespace std
-
+#include "../include/iostream"
+#ifndef ANDROID_ASTL_IOSTREAM__
+#error "Wrong header included!!"
 #endif
+#include "common.h"
+
+namespace android {
+
+class A {
+  public:
+    A() {
+        mPassed = std::cout.precision() == 6;
+    }
+    static A mInstance;
+    bool mPassed;
+};
+A A::mInstance;
+
+bool testStaticInit() {
+    EXPECT_TRUE(A::mInstance.mPassed);
+    return true;
+}
+
+bool testOstream() {
+    EXPECT_TRUE(std::cout.precision() == 6);
+    EXPECT_TRUE(std::cerr.precision() == 6);
+
+    std::cout.precision(20);
+    std::cerr.precision(20);
+
+    EXPECT_TRUE(std::cout.precision() == 20);
+    EXPECT_TRUE(std::cerr.precision() == 20);
+    // reset back to the default value.
+    std::cout.precision(6);
+    std::cerr.precision(6);
+    return true;
+}
+
+}  // namespace android
+
+int main(int argc, char **argv){
+    FAIL_UNLESS(testStaticInit);
+    FAIL_UNLESS(testOstream);
+
+    return kPassed;
+}

@@ -27,51 +27,37 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ANDROID_ASTL_OSTREAM__
-#define ANDROID_ASTL_OSTREAM__
+#ifndef ANDROID_ASTL_IOSTREAM__
+#define ANDROID_ASTL_IOSTREAM__
 
 #include <ios_base.h>
-#include <ios_pos_types.h>
-
-namespace std {
+#include <ostream>
 
 /**
- * Basic implementation of ostream. The STL standard defines a
- * basic_ostream template that gets specialized for char and
- * wchar. Since Android supports only char, we don't use a template
- * here.
+ * Declaration of the standard stream objects.
+ *
+ * The inclusion of this header will guarantee the initialization of
+ * the std streams. Since it uses statics (see ioinit below) to
+ * initialize the cout/cerr streams and that statics are initialized
+ * in their declaration order, it is best to include this file first
+ * just in case another included one uses cout/cerr in a static
+ * instance constructor.
+ *
+ * The storage for cout and cerr is in ios_globals.cpp.
  */
-class streambuf;
-class ostream: public ios_base
-{
-  public:
-    typedef char           char_type;
-    typedef int            int_type;
-    typedef streampos      pos_type;
-    typedef streamoff      off_type;
 
-  protected:
-    ostream();
+namespace std {
+// cin and clog are not supported.
+// No wchar support either.
+extern ostream cout;  // Linked to standard output
+extern ostream cerr;  // Linked to standard error (unbuffered)
 
-  public:
-    // TODO: implement.
-    ostream(streambuf *sb) {}
-    virtual ~ostream();
-
-    // Synchronize the stream buffer.
-    // TODO: implement.
-    ostream& flush() { return *this; }
-
-    /**
-     * Interface for manipulators (e.g std::endl, std::hex in
-     * expression like "std::cout << std::endl"). See iomanip header.
-     */
-    ostream& operator<<(ostream& (*manip)(ostream&)) { return manip(*this); }
-    ostream& operator<<(ios_base& (*manip)(ios_base&)) {
-        manip(*this);
-        return *this;
-    }
-};
+// Each translation unit that includes this file will get a copy of
+// this static variable. Its construction ensures that the standard
+// streams (cout, cerr, etc...) have been initialized.
+// The destruction of each instance of ioinit will flush the
+// streams (e.g on unload).
+static ios_base::Init ioinit;
 
 }  // namespace std
 

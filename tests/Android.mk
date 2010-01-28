@@ -66,6 +66,7 @@ sources := \
    test_functional.cpp \
    test_ios_base.cpp \
    test_ios_pos_types.cpp \
+   test_iostream.cpp \
    test_iterator.cpp \
    test_limits.cpp \
    test_memory.cpp \

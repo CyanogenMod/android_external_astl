@@ -20,6 +20,7 @@ LOCAL_PATH := $(call my-dir)
 
 astl_common_src_files := \
     ios_base.cpp \
+    ios_globals.cpp \
     ios_pos_types.cpp \
     ostream.cpp \
     streambuf.cpp \

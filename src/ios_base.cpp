@@ -27,8 +27,19 @@
  */
 
 #include <ios_base.h>
+#include <new>  // for placement new.
+#include <iostream>  // For cout, cerr
+#include <ostream>
+#include <streambuf>
+
+// Defined in bionic/libstdc++/src/one_time_construction.cpp
+extern "C" int __cxa_guard_acquire(int volatile * gv);
+extern "C" void __cxa_guard_release(int volatile * gv);
 
 namespace std {
+int ios_base::Init::sGuard = 0;
+bool ios_base::Init::sDone = false;
+
 // Implementation of the ios_base, common stuff for all the streams.
 
 ios_base::ios_base()
@@ -50,6 +61,36 @@ streamsize ios_base::width(streamsize width) {
         mWidth = width;
     }
     return prev;
+}
+
+// TODO: This is a temporary class used to illustrate how the
+// construction will happen.
+
+class std_filebuf: public streambuf {
+  public:
+    std_filebuf() {}
+    virtual ~std_filebuf() {}
+};
+
+static std_filebuf real_cout;
+static std_filebuf real_cerr;
+
+ios_base::Init::Init() {
+    if (__cxa_guard_acquire(&sGuard) == 1) {
+        if (!sDone) {
+            // Create the global cout and cerr structures. cout/cerr
+            // storage is in ios_globals.cpp.
+            new (&cout) ostream(&real_cout);
+            new (&cerr) ostream(&real_cerr);
+            sDone = true;
+        }
+        __cxa_guard_release(&sGuard);
+    }
+}
+
+ios_base::Init::~Init() {
+    cout.flush();
+    cerr.flush();
 }
 
 }  // namespace std

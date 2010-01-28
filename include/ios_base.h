@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ANDROID_ASTL_IOS_BASE__
-#define ANDROID_ASTL_IOS_BASE__
+#ifndef ANDROID_ASTL_IOS_BASE_H__
+#define ANDROID_ASTL_IOS_BASE_H__
 
 #include <ios_pos_types.h>
 
@@ -38,6 +38,11 @@ namespace std {
  * Root of the streams inheritance.
  * The STL defines ios_base as a template with 2 params char types and
  * traits. We support only char and no traits.
+ * ios_base defines flags, types and fields to hold these values.
+ * ios_base is extended by basic_ios which wraps a streambuf and
+ * provides common methods for all streams.
+ * The only mode supported for the standards streams (cout, cerr, cin)
+ * is synced with stdio.
  */
 
 class ios_base
@@ -80,7 +85,23 @@ class ios_base
      */
     streamsize width(streamsize width);
 
-private:
+    // Helper class to initialize the standard streams. Its
+    // construction ensures the initialization of the stdio
+    // streams (cout, cerr,...) declared in iostream.
+    // The destruction of the last instance of this class will flush
+    // the streams.
+    class Init {
+      public:
+        Init();
+        ~Init();
+
+        static bool done() { return sDone; }
+      private:
+        static int sGuard;
+        static bool sDone;
+    };
+
+  private:
     streamsize mPrecision;
     streamsize mWidth;
 };
