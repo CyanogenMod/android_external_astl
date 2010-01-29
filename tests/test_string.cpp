@@ -542,6 +542,14 @@ bool testAccessor()
     str05.reserve(100);
     str05[99] = 'a';
 
+    // 'at'
+    EXPECT_TRUE(str01.at(0) == 'E');
+    EXPECT_TRUE(str01.at(7) == 'S');
+    EXPECT_TRUE(str01.at(8) == 'X');  // 'X' is the dummy value returned.
+
+    str01.at(1) = 'A';
+    str01.at(6) = 'K';
+    EXPECT_TRUE(str01 == "EArmarKS");
     return true;
 }
 

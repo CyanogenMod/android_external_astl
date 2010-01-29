@@ -39,6 +39,9 @@
 
 namespace {
 char kEmptyString[1] = { '\0' };
+// Dummy char used in the 'at' accessor when the index is out of
+// range.
+char sDummy;
 }
 
 namespace std {
@@ -444,6 +447,26 @@ const char& string::operator[](const size_type pos) const
 char& string::operator[](const size_type pos)
 {
     return mData[pos];
+}
+
+const char& string::at(const size_type pos) const
+{
+    if (pos < mLength) {
+        return mData[pos];
+    } else {
+        sDummy = 'X';
+        return sDummy;
+    }
+}
+
+char& string::at(const size_type pos)
+{
+    if (pos < mLength) {
+        return mData[pos];
+    } else {
+        sDummy = 'X';
+        return sDummy;
+    }
 }
 
 string& string::assign(const string& str)

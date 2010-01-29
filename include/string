@@ -193,6 +193,10 @@ class string
     // @return a reference to the char.
     char& operator[](const size_type pos);
 
+    // 'at' is similar to operator[] except that it does check bounds.
+    const char& at(const size_type pos) const;
+    char& at(const size_type pos);
+
     // Assignments.
     string& operator=(const string& str) { return assign(str); }
     string& operator=(const char* str) { return assign(str); }
