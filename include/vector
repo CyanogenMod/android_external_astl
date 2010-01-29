@@ -106,7 +106,8 @@ class vector
     // @return the maximum size for a vector.
     size_type max_size() const { return (~size_type(0)) / sizeof(value_type); }
 
-    // Change the capacity to new_size. 0 means shrink to fit.
+    // Change the capacity to new_size. 0 means shrink to fit. The
+    // extra memory is not initialized when the capacity is grown.
     // @param new_size number of element to be allocated.
     // @return true if successful. The STL version returns nothing.
     bool reserve(size_type new_size = 0);
@@ -150,6 +151,14 @@ class vector
     // and capacity are both 0 on return. If you want to keep the
     // internal buffer around for reuse, call 'resize'/'erase' instead.
     void clear();
+
+    // Resize the vector to contain 'size' element. If 'size' is
+    // smaller than the current size, the extra elements are dropped
+    // but the reserved memory is not changed (use 'swap' to recover
+    // memory.) If 'size' is greater, the vector is expanded by
+    // inserting at the end as many copy of 'init_value' (this may
+    // lead to some realloc) as necessary. See 'reserve'.
+    void resize(size_type size, value_type init_value = value_type());
 
     void swap(vector& other);
   private:
@@ -335,6 +344,30 @@ void vector<_T>::clear()
     mBegin = NULL;
     mCapacity = 0;
     mLength = 0;
+}
+
+template<typename _T>
+void vector<_T>::resize(size_type new_size, value_type init_value)
+{
+    if (mLength == new_size || new_size > max_size()) {
+        return;
+    } else if (new_size < mLength) {
+        if (!is_pod<value_type>::value) {
+            const pointer end = mBegin + mLength;
+            for (pointer begin = mBegin + new_size;
+                 begin < end; ++begin) {
+                begin->~_T();
+            }
+        }
+        mLength = new_size;
+        return;
+    }
+
+    if (new_size > mCapacity && !reserve(new_size)) {
+        return;
+    }
+    std::uninitialized_fill(mBegin + mLength, mBegin + new_size, init_value);
+    mLength = new_size;
 }
 
 template<typename _T>

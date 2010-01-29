@@ -154,7 +154,7 @@ template<bool> struct __uninitialized_fill
                                    const _T& val)
     {
         for (; begin < end; ++begin)
-            new (static_cast<void*>(begin)) _ForwardIterator(val);
+            new (static_cast<void*>(&*begin)) _ForwardIterator(val);
     }
 };
 
