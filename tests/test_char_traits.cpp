@@ -39,8 +39,8 @@ bool testCharToInt()
 {
     // Check that to_int_type maps '\xff' to 0xff and NOT 0xffffffff
     // which is eof().
-    EXPECT_TRUE(char_traits::to_int_type('\xff') == 0xff);
-    EXPECT_TRUE(char_traits::to_int_type('\xff') != char_traits::eof());
+    EXPECT_TRUE(char_traits<char>::to_int_type('\xff') == 0xff);
+    EXPECT_TRUE(char_traits<char>::to_int_type('\xff') != char_traits<char>::eof());
     return true;
 }
 }  // namespace android

@@ -383,7 +383,7 @@ bool operator==(const string& left, const string& right)
         return true;
     }
     return (left.size() == right.size() &&
-            !char_traits::compare(left.mData, right.mData, left.size()));
+            !char_traits<char>::compare(left.mData, right.mData, left.size()));
 }
 
 bool operator==(const string& left, const string::value_type *right)

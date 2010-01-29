@@ -55,7 +55,7 @@ namespace std {
 class string
 {
   public:
-    typedef char_traits            traits_type;
+    typedef char_traits<char>      traits_type;
     typedef traits_type::char_type value_type;
     typedef size_t                 size_type;
     typedef ptrdiff_t              difference_type;

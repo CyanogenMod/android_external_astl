@@ -37,13 +37,18 @@
 namespace std {
 
 /**
- * Android's char traits is not a template since we support only
- * char. The state_type is missing because we don't support multibyte
- * strings.
- * Basic type and constants (eof) used in string and stream.
+ * char_traits defines the basic types and constants (eof) used in
+ * string and stream as well as basic char manipulations.
+ * Android's support only char. The state_type is missing because we
+ * don't support multibyte strings.
  */
 
-struct char_traits
+template<class _CharT> struct char_traits {
+    // Empty on purpose. You should use char_traits<char> only.
+};
+
+template<>
+struct char_traits<char>
 {
     typedef char       char_type;
     typedef int        int_type;

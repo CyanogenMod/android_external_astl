@@ -42,7 +42,7 @@ class streambuf: public std::streambuf {
   public:
     streambuf() {
         setp(mBuffer, mBuffer + sizeof(mBuffer));
-        char_traits::assign(mBuffer, sizeof(mBuffer), 'X');
+        traits_type::assign(mBuffer, sizeof(mBuffer), 'X');
     }
 
     char mBuffer[5];
@@ -56,8 +56,8 @@ bool testSputc() {
     EXPECT_TRUE(buf.sputc('C') == 67);
     EXPECT_TRUE(buf.sputc('D') == 68);
     EXPECT_TRUE(buf.sputc('E') == 69);
-    EXPECT_TRUE(buf.sputc('F') == char_traits::eof());
-    EXPECT_TRUE(buf.sputc('G') == char_traits::eof());
+    EXPECT_TRUE(buf.sputc('F') == char_traits<char>::eof());
+    EXPECT_TRUE(buf.sputc('G') == char_traits<char>::eof());
     return true;
 }
 
