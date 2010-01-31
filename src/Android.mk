@@ -21,6 +21,7 @@ astl_common_src_files := \
     ios_base.cpp \
     ios_globals.cpp \
     ios_pos_types.cpp \
+    list.cpp \
     ostream.cpp \
     stdio_filebuf.cpp \
     streambuf.cpp \

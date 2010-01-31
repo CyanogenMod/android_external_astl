@@ -92,6 +92,25 @@ size_t CtorDtorCounter::mCopyCtorCount;
 size_t CtorDtorCounter::mAssignCount;
 size_t CtorDtorCounter::mDtorCount;
 
+// These class allocate chunks to detect memory leaks.
+template<typename T> struct A {
+  public:
+    A() {mChunk = new T[2046];}
+    A(const A<T>& a) {mChunk = new T[2046];}
+    virtual ~A() {delete [] mChunk;}
+    A& operator=(const A& o) { return *this;}
+    T *mChunk;
+};
+
+struct B {
+  public:
+    B() {mChunk = new char[2046];}
+    B(const B& b) {mChunk = new char[2046];}
+    virtual ~B() {delete [] mChunk;}
+    B& operator=(const B& o) { return *this;}
+    char *mChunk;
+};
+
 }  // anonymous namespace
 
 

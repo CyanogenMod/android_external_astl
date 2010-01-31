@@ -70,6 +70,7 @@ sources := \
    test_iostream.cpp \
    test_iterator.cpp \
    test_limits.cpp \
+   test_list.cpp \
    test_memory.cpp \
    test_set.cpp \
    test_streambuf.cpp \
