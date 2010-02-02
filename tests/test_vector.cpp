@@ -88,6 +88,7 @@ template<typename T> struct A {
     A() {mChunk = new T[2046];}
     A(const A<T>& a) {mChunk = new T[2046];}
     virtual ~A() {delete [] mChunk;}
+    A& operator=(const A& o) { return *this;}
     T *mChunk;
 };
 
@@ -96,6 +97,7 @@ struct B {
     B() {mChunk = new char[2046];}
     B(const B& b) {mChunk = new char[2046];}
     virtual ~B() {delete [] mChunk;}
+    B& operator=(const B& o) { return *this;}
     char *mChunk;
 };
 
@@ -512,6 +514,151 @@ bool testCtorDtorForNonPod()
     EXPECT_TRUE(CtorDtorCounter::mDtorCount == 201);
     return true;
 }
+
+bool testEraseElt()
+{
+    {
+        vector<B> empty;
+        vector<B>::iterator res = empty.erase(empty.end());
+        EXPECT_TRUE(res == empty.end());
+        EXPECT_TRUE(empty.empty());
+    }
+    {
+        vector<B> one;
+        one.push_back(B());
+        EXPECT_TRUE(!one.empty());
+
+        vector<B>::iterator res = one.erase(one.begin());
+        EXPECT_TRUE(res == one.end());
+
+        EXPECT_TRUE(one.begin() == one.end());
+        EXPECT_TRUE(one.empty());
+    }
+    {
+        vector<B> two;
+        two.push_back(B());
+        two.push_back(B());
+
+        vector<B>::iterator res = two.erase(two.begin());
+
+        EXPECT_TRUE(res == two.begin());
+        EXPECT_TRUE(res != two.end());
+
+        EXPECT_TRUE(two.begin() != two.end());
+        EXPECT_TRUE(two.size() == 1);
+    }
+    {
+        vector<int> vec;
+        for (int i = 0; i < 20; ++i) vec.push_back(i);
+        vector<int>::iterator pos;
+
+        pos = vec.erase(vec.begin() + 2);  // removes '2'
+        EXPECT_TRUE(*pos == 3);            // returns '3'
+
+        pos = vec.erase(vec.begin() + 18); // removes '19' now @ pos 18
+        EXPECT_TRUE(pos == vec.end());     // returns end()
+        EXPECT_TRUE(*(--pos) == 18);       // last one is now '18'
+    }
+    {
+        vector<std::string> vec;
+
+        vec.push_back("first");
+        vec.push_back("second");
+        vec.push_back("third");
+        vec.push_back("fourth");
+
+        vector<std::string>::iterator pos;
+        pos = vec.erase(vec.begin() + 1);  // removes 'second'
+        EXPECT_TRUE(vec.size() == 3);
+        EXPECT_TRUE(*pos == "third");
+        EXPECT_TRUE(vec[0] == "first");
+        EXPECT_TRUE(vec[1] == "third");
+        EXPECT_TRUE(vec[2] == "fourth");
+    }
+    return true;
+}
+
+bool testEraseRange()
+{
+    {
+        vector<B> empty;
+        vector<B>::iterator res = empty.erase(empty.begin(), empty.end());
+        EXPECT_TRUE(res == empty.end());
+        EXPECT_TRUE(empty.empty());
+        EXPECT_TRUE(empty.size() == 0);
+    }
+    {
+        vector<B> one;
+        one.push_back(B());
+        EXPECT_TRUE(!one.empty());
+
+        vector<B>::iterator res = one.erase(one.begin(), one.end());
+        EXPECT_TRUE(res == one.end());
+
+        EXPECT_TRUE(one.begin() == one.end());
+        EXPECT_TRUE(one.empty());
+    }
+    {
+        vector<B> two;
+        two.push_back(B());
+        two.push_back(B());
+
+        // erase the 1st one.
+        vector<B>::iterator res = two.erase(two.begin(), two.begin() + 1);
+
+        EXPECT_TRUE(res == two.begin());
+        EXPECT_TRUE(res != two.end());
+
+        EXPECT_TRUE(two.begin() != two.end());
+        EXPECT_TRUE(two.size() == 1);
+    }
+    {
+        vector<B> two;
+        two.push_back(B());
+        two.push_back(B());
+
+        // erase range is empty.
+        vector<B>::iterator res = two.erase(two.begin(), two.begin());
+
+        EXPECT_TRUE(res == two.begin());
+        EXPECT_TRUE(res != two.end());
+
+        EXPECT_TRUE(two.begin() != two.end());
+        EXPECT_TRUE(two.size() == 2);
+    }
+
+    {
+        vector<int> vec;
+        for (int i = 0; i < 20; ++i) vec.push_back(i);
+        vector<int>::iterator pos;
+
+        pos = vec.erase(vec.begin() + 2, vec.begin() + 3);  // removes '2'
+        EXPECT_TRUE(*pos == 3);                             // returns '3'
+
+        pos = vec.erase(vec.begin() + 18, vec.end()); // removes '19' now @ pos 18
+        EXPECT_TRUE(pos == vec.end());                // returns end()
+        EXPECT_TRUE(*(--pos) == 18);                  // last one is now '18'
+    }
+    {
+        vector<std::string> vec;
+
+        vec.push_back("first");
+        vec.push_back("second");
+        vec.push_back("third");
+        vec.push_back("fourth");
+
+        vector<std::string>::iterator pos;
+        pos = vec.erase(vec.begin() + 1, vec.begin() + 3);  // removes 'second' and third.
+        EXPECT_TRUE(vec.size() == 2);
+        EXPECT_TRUE(*pos == "fourth");
+        EXPECT_TRUE(vec[0] == "first");
+        EXPECT_TRUE(vec[1] == "fourth");
+        pos = vec.erase(vec.begin(), vec.end());  // clears the vector
+        EXPECT_TRUE(vec.empty());
+    }
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -519,17 +666,16 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testConstructorInt);
     FAIL_UNLESS(testConstructorString);
     FAIL_UNLESS(testConstructorClass);
-
     FAIL_UNLESS(testConstructorRepeat);
     FAIL_UNLESS(testConstructorIterator);
     FAIL_UNLESS(testReserve);
     FAIL_UNLESS(testPushBack);
     FAIL_UNLESS(testPopBack);
     FAIL_UNLESS(testResize);
-#if(0)
     FAIL_UNLESS(testSwap);
     FAIL_UNLESS(testIterators);
     FAIL_UNLESS(testCtorDtorForNonPod);
-#endif
+    FAIL_UNLESS(testEraseElt);
+    FAIL_UNLESS(testEraseRange);
     return kPassed;
 }

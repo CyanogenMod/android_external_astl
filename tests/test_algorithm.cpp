@@ -134,6 +134,21 @@ bool testEqual()
     return true;
 }
 
+bool testCopy()
+{
+    {
+        int data[] = {1,2,3,4,5,6};
+        std::copy(data + 2, data + 5, data);
+        EXPECT_TRUE(data[0] == 3);
+        EXPECT_TRUE(data[1] == 4);
+        EXPECT_TRUE(data[2] == 5);
+        EXPECT_TRUE(data[3] == 4);
+        EXPECT_TRUE(data[4] == 5);
+        EXPECT_TRUE(data[5] == 6);
+    }
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -144,5 +159,6 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testFill);
     FAIL_UNLESS(testFill_N);
     FAIL_UNLESS(testEqual);
+    FAIL_UNLESS(testCopy);
     return kPassed;
 }

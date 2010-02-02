@@ -32,6 +32,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <iterator>
 #include <type_traits.h>
 #ifndef ANDROID_ASTL_TYPE_TRAITS_H__
 #error "Wrong file included!"
@@ -45,6 +46,7 @@ namespace std {
 // - swap
 // - fill
 // - fill_n
+// - copy
 // - equal
 
 template<typename _T> inline const _T& min(const _T& left, const _T& right)
@@ -66,13 +68,69 @@ template<typename _T> inline void swap(_T& left, _T& right)
     right = tmp;
 }
 
+
+// Basic iterators, loop over the elements, we don't know how many
+// elements we need to copy. See the random access specialization
+// below.
+template<typename _Category>
+struct copy_move {
+    template<typename _InputIterator, typename _OutputIterator>
+    static _OutputIterator
+    __copy_move(_InputIterator first, _InputIterator last, _OutputIterator res) {
+        for (; first != last; ++res, ++first) {
+            *res = *first;
+        }
+        return res;
+    }
+};
+
+// For random access iterators, we know how many elements we have to
+// copy (random iterators support operator-).
+template<>
+struct copy_move<random_access_iterator_tag> {
+    template<typename _InputIterator, typename _OutputIterator>
+    static _OutputIterator
+    __copy_move(_InputIterator first, _InputIterator last, _OutputIterator res) {
+        typedef typename iterator_traits<_InputIterator>::difference_type
+                difference_type;
+
+        for (difference_type n = last - first; n > 0; --n) {
+            *res = *first;
+            ++first;
+            ++res;
+        }
+        return res;
+    }
+};
+
+// TODO: for simple case and wrapper iterator, should degrade to memmove.
+
+// copy elements in the range [first, last) into the range [result,
+// result + (last - first)) starting from first and proceeding to
+// last.
+//
+// For each non negative n < (last - first) performs:
+// *(result + n) = *(first + n)
+// @require result should not be in the [first, last) range.
+// @return result + (last - first)
+template<typename _InputIterator, typename _OutputIterator>
+inline _OutputIterator
+copy(_InputIterator first, _InputIterator last, _OutputIterator res) {
+    typedef typename iterator_traits<_InputIterator>::iterator_category
+            _Category;
+
+    return copy_move<_Category>::__copy_move(
+        android::iter<_InputIterator>::base(first),
+        android::iter<_InputIterator>::base(last),
+        res);
+}
+
 // fill the range [begin, end) with copies of value, return nothing.
 // fill_n the range [begin, begin + n) with copies of value, return
 // the pointer at begin + n.
 //
 // TODO: fill and fill_n should take forward and output iterators for
 // begin and end params. Fix this when iterator are defined.
-
 
 template<bool> struct __fill
 {
@@ -235,6 +293,5 @@ inline bool equal(_InputIterator1 begin1, _InputIterator1 end1,
 }
 
 }  // namespace std
-
 
 #endif

@@ -147,6 +147,18 @@ class vector
     // the internal buffer: you need to call reserve() to recover it.
     void pop_back();
 
+    // Remove the element pointed by the iterator.
+    // Expensive since the remaining elts must be shifted around.
+    // @param pos Iterator pointing to the elt to be removed.
+    // @return An iterator pointing to the next elt or end().
+    iterator erase(iterator pos);
+
+    // Remove a range of elements [first, last)
+    // @param first Iterator pointing to the first element to be removed.
+    // @param last Iterator pointing to one past the last element to be removed.
+    // @return An iterator pointing to the elt next to 'last' or end().
+    iterator erase(iterator first, iterator last);
+
     // Empty the vector on return. Release the internal buffer. Length
     // and capacity are both 0 on return. If you want to keep the
     // internal buffer around for reuse, call 'resize'/'erase' instead.
@@ -325,6 +337,37 @@ void vector<_T>::pop_back()
             (mBegin + mLength)->~_T();
         }
     }
+}
+
+template<typename _T>
+typename vector<_T>::iterator
+vector<_T>::erase(iterator pos) {
+    if (mLength) {
+        std::copy(pos + 1, end(), pos);
+        --mLength;
+        if (!is_pod<value_type>::value) {
+            end()->~_T();
+        }
+    }
+    return pos;
+}
+
+template<typename _T>
+typename vector<_T>::iterator
+vector<_T>::erase(iterator first, iterator last) {
+    difference_type len = std::distance(first, last);
+    if (len > 0) {
+        last = std::copy(last, end(), first);
+
+        if (!is_pod<value_type>::value) {
+            while (last != end()) {
+                last->~_T();
+                ++last;
+            }
+        }
+        mLength -= len;
+    }
+    return first;
 }
 
 template<typename _T>

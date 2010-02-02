@@ -31,6 +31,7 @@
 #define ANDROID_ASTL_ITERATOR__
 
 #include <cstddef>
+#include <type_traits.h>
 
 // Iterators are a generalization of pointers to allow programs to
 // work with different data structures (containers) in a uniform
@@ -92,10 +93,12 @@ struct iterator_traits<const _T*>
 
 // Wrap an interator that is not a class (e.g pointer) into an
 // iterator that is a class.
+// TODO: move this definition in the android ns.
 template<typename _Iterator, typename _Container>
 class __wrapper_iterator
 {
   public:
+    typedef _Iterator iterator_type;
     typedef typename iterator_traits<_Iterator>::iterator_category
     iterator_category;
     typedef typename iterator_traits<_Iterator>::value_type value_type;
@@ -212,6 +215,32 @@ template<typename _Iterator>
 inline typename std::iterator_traits<_Iterator>::iterator_category
 iterator_category(const _Iterator&)
 { return typename std::iterator_traits<_Iterator>::iterator_category(); }
+
+// Detect wrapper iterators.
+template<typename _T>
+struct is_wrapper_iterator: public std::false_type { };
+
+template<typename _Iterator, typename _Container>
+struct is_wrapper_iterator<std::__wrapper_iterator<_Iterator, _Container> >:
+            public std::true_type { };
+
+// iter::base
+//
+// For wrapper iterators, android::iter::base(it) returns a pointer
+// (it.base()) which is going to match implementation(s) that use
+// pointers (e.g memmove).
+template<typename _Iterator,
+         bool _IsWrapper = is_wrapper_iterator<_Iterator>::value>
+struct iter {
+    static _Iterator base(_Iterator it) { return it; }
+};
+
+template<typename _Iterator>
+struct iter<_Iterator, true> {
+    static typename _Iterator::iterator_type base(_Iterator it) {
+        return it.base();
+    }
+};
 
 }  // namespace android
 

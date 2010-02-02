@@ -33,6 +33,7 @@
 #endif
 #include <climits>
 #include <cstring>
+#include <algorithm>
 #include "common.h"
 
 
@@ -615,6 +616,19 @@ bool testAssignment()
     return true;
 }
 
+bool testCopy()
+{
+    string data[] = {"one", "two", "three", "four", "five", "six"};
+    std::copy(data + 2, data + 5, data);
+    EXPECT_TRUE(data[0] == "three");
+    EXPECT_TRUE(data[1] == "four");
+    EXPECT_TRUE(data[2] == "five");
+    EXPECT_TRUE(data[3] == "four");
+    EXPECT_TRUE(data[4] == "five");
+    EXPECT_TRUE(data[5] == "six");
+    return true;
+}
+
 
 bool testConcat()
 {
@@ -915,6 +929,7 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testAppendOperator);
     FAIL_UNLESS(testConcat);
     FAIL_UNLESS(testAssignment);
+    FAIL_UNLESS(testCopy);
     FAIL_UNLESS(testReserve);
     FAIL_UNLESS(testCompare);
     FAIL_UNLESS(testAccessor);

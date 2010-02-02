@@ -109,10 +109,21 @@ bool testCategory()
     return true;
 }
 
+typedef std::__wrapper_iterator<int *, int *> WrapperIterator;
+
+// Check we can distinguish wrapper iterators.
+bool testWrapperIterator()
+{
+    EXPECT_FALSE(android::is_wrapper_iterator<android::Random>::value);
+    EXPECT_TRUE(android::is_wrapper_iterator<android::WrapperIterator>::value);
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
 {
     FAIL_UNLESS(testCategory);
+    FAIL_UNLESS(testWrapperIterator);
     return kPassed;
 }
