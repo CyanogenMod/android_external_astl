@@ -44,6 +44,13 @@ ostream& ostream::operator<<(const char_type *str) {
     return *this;
 }
 
+ostream& ostream::put(char_type c) {
+    if (this->rdbuf()) {
+        this->rdbuf()->sputn(&c, 1);
+    }
+    return *this;
+}
+
 ostream& ostream::flush() {
     if (this->rdbuf()) {
         // TODO: if pubsync returns -1 should mark this stream as

@@ -71,11 +71,18 @@ bool testCoutCerr() {
     return true;
 }
 
+bool testManip() {
+    std::cout << "line 1" << std::endl
+              << " a nul char |" << std::ends << std::flush << "| in line 2.";
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv){
     FAIL_UNLESS(testStaticInit);
     FAIL_UNLESS(testOstream);
     FAIL_UNLESS(testCoutCerr);
+    FAIL_UNLESS(testManip);
     return kPassed;
 }

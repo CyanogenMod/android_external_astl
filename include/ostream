@@ -73,7 +73,27 @@ class ostream: public basic_ios
     }
 
     ostream& operator<<(const char_type *str);
+
+    /**
+     *  Tries to insert a char.
+     */
+    ostream& put(char_type c);
 };
+
+/**
+ * Flushes the output stream.
+ */
+inline ostream& flush(ostream& os) { return os.flush(); }
+
+/**
+ * Write a newline and flush the stream.
+ */
+inline ostream& endl(ostream& os) { return flush(os.put('\n')); }
+
+/**
+ * Write a null character into the output sequence.
+ */
+inline ostream& ends(ostream& os) { return os.put(char()); }
 
 }  // namespace std
 
