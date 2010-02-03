@@ -1,4 +1,3 @@
-/* -*- c++ -*- */
 /*
  * Copyright (C) 2010 The Android Open Source Project
  * All rights reserved.
@@ -27,52 +26,22 @@
  * SUCH DAMAGE.
  */
 
-#ifndef ANDROID_ASTL_OSTREAM__
-#define ANDROID_ASTL_OSTREAM__
-
-#include <ios_base.h>
-#include <ios_pos_types.h>
+// Make sure <iostream> is not included directly or indirectly. You
+// can include <ostream> and/or <istream> just fine but <iostream>
+// contains forward declarations for cout, cerr... that will conflict
+// with the ones below.
+#include <ostream>
 
 namespace std {
 
-/**
- * Basic implementation of ostream. The STL standard defines a
- * basic_ostream template that gets specialized for char and
- * wchar. Since Android supports only char, we don't use a template
- * here.
- */
-class streambuf;
-class ostream: public ios_base
-{
-  public:
-    typedef char           char_type;
-    typedef int            int_type;
-    typedef streampos      pos_type;
-    typedef streamoff      off_type;
+// Global instances of cout and cerr. Here we reserve the memory for
+// the stdio filebuf. The first time ios_base::Init::Init() is called,
+// placement new is used to initialize these areas with proper
+// instances of the streams.
 
-  protected:
-    ostream();
-
-  public:
-    // TODO: implement.
-    ostream(streambuf *sb) {}
-    virtual ~ostream();
-
-    // Synchronize the stream buffer.
-    // TODO: implement.
-    ostream& flush() { return *this; }
-
-    /**
-     * Interface for manipulators (e.g std::endl, std::hex in
-     * expression like "std::cout << std::endl"). See iomanip header.
-     */
-    ostream& operator<<(ostream& (*manip)(ostream&)) { return manip(*this); }
-    ostream& operator<<(ios_base& (*manip)(ios_base&)) {
-        manip(*this);
-        return *this;
-    }
-};
+typedef char ostream_mem[sizeof(ostream)]
+__attribute__ ((aligned(__alignof__(ostream))));
+ostream_mem cout;
+ostream_mem cerr;
 
 }  // namespace std
-
-#endif

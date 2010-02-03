@@ -28,7 +28,7 @@
  */
 
 #include "../include/ios_base.h"
-#ifndef ANDROID_ASTL_IOS_BASE__
+#ifndef ANDROID_ASTL_IOS_BASE_H__
 #error "Wrong header included!!"
 #endif
 #include "common.h"

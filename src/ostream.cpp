@@ -29,10 +29,10 @@
 #include <ostream>
 
 namespace std {
-// Implementation of the std::ostream class.
+// Defined in bionic/libstdc++/src/one_time_construction.cpp
 
-ostream::ostream() {}
+ostream::ostream() { }
 
-ostream::~ostream() {}
+ostream::~ostream() { }
 
 }  // namespace std
