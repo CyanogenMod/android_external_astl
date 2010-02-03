@@ -12,17 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Build control file for Bionic's test programs
-# define the BIONIC_TESTS environment variable to build the test programs
 #
 
 LOCAL_PATH := $(call my-dir)
 
 astl_common_src_files := \
+    basic_ios.cpp \
     ios_base.cpp \
     ios_globals.cpp \
     ios_pos_types.cpp \
     ostream.cpp \
+    stdio_filebuf.cpp \
     streambuf.cpp \
     string.cpp
 

@@ -27,70 +27,53 @@
  * SUCH DAMAGE.
  */
 
-#include "../include/ios_base.h"
-#ifndef ANDROID_ASTL_IOS_BASE_H__
-#error "Wrong header included!!"
-#endif
-#include "common.h"
+#ifndef ANDROID_ASTL_BASIC_IOS_H__
+#define ANDROID_ASTL_BASIC_IOS_H__
 
-namespace android {
-class ios: public std::ios_base {
+#include <ios_base.h>
+
+namespace std {
+
+// basic_ios holds the streambuf instance used to perform th I/O
+// operations.
+// A concrete stream implementation does its work and calls rdbuf() to
+// access the streambuf when it is ready to output the date (if the
+// stream is an ostream).
+// The standard says that basic_ios should deal with the state of the
+// stream (good,eof,fail, etc), currently this is not implemented.
+
+class streambuf;
+class basic_ios: public ios_base {
   public:
+    typedef int io_state;
+    typedef int open_mode;
+    typedef int seek_dir;
+    typedef std::streampos streampos;
+    typedef std::streamoff streamoff;
+
+  protected:
+    basic_ios();
+
+  public:
+    // No op, does NOT destroy mStreambuf.
+    virtual ~basic_ios();
+
+    /**
+     * Change the unlying buffer.
+     * @param sb The new buffer.
+     * @return The previous stream buffer.
+     */
+    streambuf* rdbuf(streambuf *sb);
+    /**
+     * @return the underlying buffer associated with this stream.
+     */
+    streambuf* rdbuf() const { return mStreambuf; }
+
+  protected:
+    void init(streambuf* sb);
+    streambuf* mStreambuf;
 };
 
-bool testDefaultPrecision() {
-    ios s;
-    EXPECT_TRUE(s.precision() == 6);
-    return true;
-}
+}  // namespace std
 
-bool testSetPrecision() {
-    ios s;
-    EXPECT_TRUE(s.precision(10) == 6);
-    EXPECT_TRUE(s.precision() == 10);
-    EXPECT_TRUE(s.precision(-1) == 10); // no-op
-    EXPECT_TRUE(s.precision() == 10);
-    return true;
-}
-
-bool testDefaultWidth() {
-    ios s;
-    EXPECT_TRUE(s.width() == 0);
-    return true;
-}
-
-bool testSetWidth() {
-    ios s;
-    EXPECT_TRUE(s.width(10) == 0);
-    EXPECT_TRUE(s.width() == 10);
-    EXPECT_TRUE(s.width(-1) == 10); // no-op
-    EXPECT_TRUE(s.width() == 10);
-    return true;
-}
-
-bool testInit() {
-    {
-        std::ios_base::Init init;
-        EXPECT_TRUE(init.done());
-    }
-    {
-        std::ios_base::Init init1;
-        EXPECT_TRUE(init1.done());
-        std::ios_base::Init init2;
-        EXPECT_TRUE(init2.done());
-        std::ios_base::Init init3;
-        EXPECT_TRUE(init3.done());
-    }
-    return true;
-}
-
-}  // namespace android
-
-int main(int argc, char **argv){
-    FAIL_UNLESS(testDefaultPrecision);
-    FAIL_UNLESS(testSetPrecision);
-    FAIL_UNLESS(testDefaultWidth);
-    FAIL_UNLESS(testSetWidth);
-    FAIL_UNLESS(testInit);
-    return kPassed;
-}
+#endif

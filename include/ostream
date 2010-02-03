@@ -31,7 +31,9 @@
 #define ANDROID_ASTL_OSTREAM__
 
 #include <ios_base.h>
+#include <basic_ios.h>
 #include <ios_pos_types.h>
+#include <char_traits.h>
 
 namespace std {
 
@@ -42,25 +44,23 @@ namespace std {
  * here.
  */
 class streambuf;
-class ostream: public ios_base
+class ostream: public basic_ios
 {
   public:
-    typedef char           char_type;
-    typedef int            int_type;
-    typedef streampos      pos_type;
-    typedef streamoff      off_type;
+    typedef char                             char_type;
+    typedef char_traits<char_type>::int_type int_type;
+    typedef char_traits<char_type>::pos_type pos_type;
+    typedef char_traits<char_type>::off_type off_type;
 
   protected:
     ostream();
 
   public:
-    // TODO: implement.
-    ostream(streambuf *sb) {}
+    explicit ostream(streambuf *sb) { this->init(sb); }
     virtual ~ostream();
 
     // Synchronize the stream buffer.
-    // TODO: implement.
-    ostream& flush() { return *this; }
+    ostream& flush();
 
     /**
      * Interface for manipulators (e.g std::endl, std::hex in
@@ -71,6 +71,8 @@ class ostream: public ios_base
         manip(*this);
         return *this;
     }
+
+    ostream& operator<<(const char_type *str);
 };
 
 }  // namespace std

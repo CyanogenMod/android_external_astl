@@ -54,7 +54,7 @@ bool testUnitializedCopyPODRandomIterators() {
 }
 
 bool testUnitializedCopyClassRandomIterators() {
-    const int kLen = 10;
+    const size_t kLen = 10;
     const CtorDtorCounter kSrc[10];
     const CtorDtorCounter *begin = kSrc;
     const CtorDtorCounter *end = begin + kLen;

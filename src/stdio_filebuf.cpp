@@ -1,4 +1,3 @@
-/* -*- c++ -*- */
 /*
  * Copyright (C) 2010 The Android Open Source Project
  * All rights reserved.
@@ -27,70 +26,26 @@
  * SUCH DAMAGE.
  */
 
-#include "../include/ios_base.h"
-#ifndef ANDROID_ASTL_IOS_BASE_H__
-#error "Wrong header included!!"
-#endif
-#include "common.h"
+#include <stdio_filebuf.h>
+#include <cstdio>
+#include <ios_pos_types.h>
+#include <streambuf>
 
 namespace android {
-class ios: public std::ios_base {
-  public:
-};
-
-bool testDefaultPrecision() {
-    ios s;
-    EXPECT_TRUE(s.precision() == 6);
-    return true;
+stdio_filebuf::stdio_filebuf(std::FILE* stream)
+    : mStream(stream) {
 }
 
-bool testSetPrecision() {
-    ios s;
-    EXPECT_TRUE(s.precision(10) == 6);
-    EXPECT_TRUE(s.precision() == 10);
-    EXPECT_TRUE(s.precision(-1) == 10); // no-op
-    EXPECT_TRUE(s.precision() == 10);
-    return true;
+stdio_filebuf::~stdio_filebuf() {
 }
 
-bool testDefaultWidth() {
-    ios s;
-    EXPECT_TRUE(s.width() == 0);
-    return true;
+std::streamsize
+stdio_filebuf::xsputn(const std::streambuf::char_type* str, std::streamsize num) {
+    return fprintf(mStream, "%.*s", num, str);
 }
 
-bool testSetWidth() {
-    ios s;
-    EXPECT_TRUE(s.width(10) == 0);
-    EXPECT_TRUE(s.width() == 10);
-    EXPECT_TRUE(s.width(-1) == 10); // no-op
-    EXPECT_TRUE(s.width() == 10);
-    return true;
-}
-
-bool testInit() {
-    {
-        std::ios_base::Init init;
-        EXPECT_TRUE(init.done());
-    }
-    {
-        std::ios_base::Init init1;
-        EXPECT_TRUE(init1.done());
-        std::ios_base::Init init2;
-        EXPECT_TRUE(init2.done());
-        std::ios_base::Init init3;
-        EXPECT_TRUE(init3.done());
-    }
-    return true;
+int stdio_filebuf::sync() {
+    return fflush(mStream);
 }
 
 }  // namespace android
-
-int main(int argc, char **argv){
-    FAIL_UNLESS(testDefaultPrecision);
-    FAIL_UNLESS(testSetPrecision);
-    FAIL_UNLESS(testDefaultWidth);
-    FAIL_UNLESS(testSetWidth);
-    FAIL_UNLESS(testInit);
-    return kPassed;
-}

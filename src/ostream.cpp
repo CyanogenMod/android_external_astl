@@ -27,6 +27,8 @@
  */
 
 #include <ostream>
+#include <streambuf>
+#include <cstring>
 
 namespace std {
 // Defined in bionic/libstdc++/src/one_time_construction.cpp
@@ -34,5 +36,21 @@ namespace std {
 ostream::ostream() { }
 
 ostream::~ostream() { }
+
+ostream& ostream::operator<<(const char_type *str) {
+    if (this->rdbuf() && str) {
+        this->rdbuf()->sputn(str, strlen(str));
+    }
+    return *this;
+}
+
+ostream& ostream::flush() {
+    if (this->rdbuf()) {
+        // TODO: if pubsync returns -1 should mark this stream as
+        // 'bad'.
+        this->rdbuf()->pubsync();
+    }
+    return *this;
+}
 
 }  // namespace std

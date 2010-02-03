@@ -65,11 +65,17 @@ bool testOstream() {
     return true;
 }
 
+bool testCoutCerr() {
+    std::cout << "Hi from stdout\n";
+    std::cerr << "Hi from stderr\n";
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv){
     FAIL_UNLESS(testStaticInit);
     FAIL_UNLESS(testOstream);
-
+    FAIL_UNLESS(testCoutCerr);
     return kPassed;
 }

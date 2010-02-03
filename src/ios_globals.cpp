@@ -31,6 +31,7 @@
 // contains forward declarations for cout, cerr... that will conflict
 // with the ones below.
 #include <ostream>
+#include <stdio_filebuf.h>
 
 namespace std {
 
@@ -38,6 +39,16 @@ namespace std {
 // the stdio filebuf. The first time ios_base::Init::Init() is called,
 // placement new is used to initialize these areas with proper
 // instances of the streams.
+//
+// - cout and cerr are mandated by the standard.
+// - stdio_filebuf_cout and stdio_filebuf_cerr are our own stdio and
+//   stderr streambuf implementation used to build the cout and cerr
+//   ostreams. (see ios_base::Init::Init())
+
+typedef char stdio_filebuf_mem[sizeof(android::stdio_filebuf)]
+__attribute__ ((aligned(__alignof__(android::stdio_filebuf))));
+stdio_filebuf_mem stdio_filebuf_cout;
+stdio_filebuf_mem stdio_filebuf_cerr;
 
 typedef char ostream_mem[sizeof(ostream)]
 __attribute__ ((aligned(__alignof__(ostream))));

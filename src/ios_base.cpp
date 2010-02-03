@@ -27,9 +27,11 @@
  */
 
 #include <ios_base.h>
+#include <cstdio>
 #include <new>  // for placement new.
 #include <iostream>  // For cout, cerr
 #include <ostream>
+#include <stdio_filebuf.h>
 #include <streambuf>
 
 // Defined in bionic/libstdc++/src/one_time_construction.cpp
@@ -72,16 +74,20 @@ class std_filebuf: public streambuf {
     virtual ~std_filebuf() {}
 };
 
-static std_filebuf real_cout;
-static std_filebuf real_cerr;
+// Storage is declared in src/ios_globals.cpp
+extern android::stdio_filebuf stdio_filebuf_cout;
+extern android::stdio_filebuf stdio_filebuf_cerr;
 
 ios_base::Init::Init() {
     if (__cxa_guard_acquire(&sGuard) == 1) {
         if (!sDone) {
-            // Create the global cout and cerr structures. cout/cerr
-            // storage is in ios_globals.cpp.
-            new (&cout) ostream(&real_cout);
-            new (&cerr) ostream(&real_cerr);
+            // Create the global cout and cerr
+            // structures. stdio_filebuf_cout/stdio_filebuf_cerr and
+            // cout/cerr storage are in ios_globals.cpp.
+            new (&stdio_filebuf_cout) android::stdio_filebuf(stdout);
+            new (&stdio_filebuf_cerr) android::stdio_filebuf(stderr);
+            new (&cout) ostream(&stdio_filebuf_cout);
+            new (&cerr) ostream(&stdio_filebuf_cerr);
             sDone = true;
         }
         __cxa_guard_release(&sGuard);
