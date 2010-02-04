@@ -32,6 +32,32 @@
 
 #include <ios_pos_types.h>
 
+namespace android {
+// Flags are used to put the stream is a certain state which affect
+// how data is formatted.
+enum IosBaseFlags {
+    ios_baseflags_boolalpha   = 1 << 0,
+    ios_baseflags_dec         = 1 << 1,
+    ios_baseflags_fixed       = 1 << 2,
+    ios_baseflags_hex         = 1 << 3,
+    ios_baseflags_internal    = 1 << 4,
+    ios_baseflags_left        = 1 << 5,
+    ios_baseflags_oct         = 1 << 6,
+    ios_baseflags_right       = 1 << 7,
+    ios_baseflags_scientific  = 1 << 8,
+    ios_baseflags_showbase    = 1 << 9,
+    ios_baseflags_showpoint   = 1 << 10,
+    ios_baseflags_showpos     = 1 << 11,
+    ios_baseflags_skipws      = 1 << 12,
+    ios_baseflags_unitbuf     = 1 << 13,
+    ios_baseflags_uppercase   = 1 << 14,
+    ios_baseflags_adjustfield = ios_baseflags_left | ios_baseflags_right | ios_baseflags_internal,
+    ios_baseflags_basefield   = ios_baseflags_dec | ios_baseflags_oct | ios_baseflags_hex,
+    ios_baseflags_floatfield  = ios_baseflags_scientific | ios_baseflags_fixed,
+    ios_baseflags_end         = 1 << 15
+};
+}  // namespace android
+
 namespace std {
 
 /**
@@ -60,6 +86,70 @@ class ios_base
 
   public:
     virtual ~ios_base();
+    typedef int fmtflags;
+
+    // boolalpha:  Insert and extract bool type in alphabetic format.
+    // dec:        Convert integer input or generates integer output in
+    //             decimal base.
+    // fixed:      Generate floating-point output in a fixed-point notation.
+    // hex:        Convert integer input or generates integer output in
+    //             hexadecimal base.
+    // internal:   Adds fill characters as the designated interanl point
+    //             in certain generated output, or identical to right
+    //             if no such point is designated.
+    // left:       Adds fill characters on the right (final positions) of
+    //             certain generated output.
+    // oct:        Convert integer input or generates integer output in octal
+    //             base.
+    // right:      Adds fill characters on the left (initial positions) of
+    //             certain generated output.
+    // scientific: Generates floating point output in scientific notation.
+    // showbase:   Generates a prefix indicating the numeric base of generated
+    //             integer output.
+    // showpoint:  Generate a decimal point character unconditionally in
+    //             generated floating point output.
+    // showpos:    Generate a + sign in non-negative generated numeric output.
+    // skipws:     Skips leading white space before certain input operations.
+    // unitbuf:    Flushes output after each output operation.
+    // uppercase:  Replaces certain lowercase letters with their upppercase
+    //             equivalents in generated output.
+    static const fmtflags boolalpha   = android::ios_baseflags_boolalpha;
+    static const fmtflags dec         = android::ios_baseflags_dec;
+    static const fmtflags fixed       = android::ios_baseflags_fixed;
+    static const fmtflags hex         = android::ios_baseflags_hex;
+    static const fmtflags internal    = android::ios_baseflags_internal;
+    static const fmtflags left        = android::ios_baseflags_left;
+    static const fmtflags oct         = android::ios_baseflags_oct;
+    static const fmtflags right       = android::ios_baseflags_right;
+    static const fmtflags scientific  = android::ios_baseflags_scientific;
+    static const fmtflags showbase    = android::ios_baseflags_showbase;
+    static const fmtflags showpoint   = android::ios_baseflags_showpoint;
+    static const fmtflags showpos     = android::ios_baseflags_showpos;
+    static const fmtflags skipws      = android::ios_baseflags_skipws;
+    static const fmtflags unitbuf     = android::ios_baseflags_unitbuf;
+    static const fmtflags uppercase   = android::ios_baseflags_uppercase;
+
+    static const fmtflags adjustfield = android::ios_baseflags_adjustfield;
+    static const fmtflags basefield   = android::ios_baseflags_basefield;
+    static const fmtflags floatfield  = android::ios_baseflags_floatfield;
+
+    // Set all the flags at once.
+    // @return the previous value of the format flags
+    fmtflags flags(fmtflags flags);
+
+    // @return all the flags at once
+    fmtflags flags() const { return mFlags; }
+
+    // Set flags.
+    // @return the previous value of the format flags
+    fmtflags setf(fmtflags flags);
+
+    // Clears 'mask' and set the 'flags' & 'mask'.
+    // @return the previous value of the format flags
+    fmtflags setf(fmtflags flags, fmtflags mask);
+
+    // Clears 'mask'.
+    void unsetf(fmtflags mask);
 
     /**
      * @return The precision (number of digits after the decimal
@@ -86,8 +176,9 @@ class ios_base
     streamsize width(streamsize width);
 
     // Helper class to initialize the standard streams. Its
-    // construction ensures the initialization of the stdio
-    // streams (cout, cerr,...) declared in iostream.
+    // construction ensures the initialization of the stdio streams
+    // (cout, cerr,...) declared in iostream. These wrap the standard
+    // C streams declared in <cstdio>.
     // The destruction of the last instance of this class will flush
     // the streams.
     class Init {
@@ -102,6 +193,7 @@ class ios_base
     };
 
   private:
+    fmtflags   mFlags;
     streamsize mPrecision;
     streamsize mWidth;
 };

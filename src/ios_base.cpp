@@ -45,9 +45,32 @@ bool ios_base::Init::sDone = false;
 // Implementation of the ios_base, common stuff for all the streams.
 
 ios_base::ios_base()
-    : mPrecision(6), mWidth(0) {}
+    : mFlags(skipws | dec), mPrecision(6), mWidth(0) {}
 
 ios_base::~ios_base() {}
+
+ios_base::fmtflags ios_base::flags(fmtflags flags) {
+    fmtflags prev = mFlags;
+    mFlags = flags;
+    return prev;
+}
+
+ios_base::fmtflags ios_base::setf(fmtflags flags) {
+    fmtflags prev = mFlags;
+    mFlags = flags;
+    return prev;
+}
+
+ios_base::fmtflags ios_base::setf(fmtflags flags, fmtflags mask) {
+    fmtflags prev = mFlags;
+    mFlags &= ~mask;
+    mFlags |= (flags & mask);
+    return prev;
+}
+
+void ios_base::unsetf(fmtflags mask) {
+    mFlags &= ~mask;
+}
 
 streamsize ios_base::precision(streamsize precision) {
     const streamsize prev = mPrecision;
