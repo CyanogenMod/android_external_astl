@@ -32,6 +32,7 @@
 #include <cstddef>
 #include <cstring>
 #include <malloc.h>
+#include <ostream>
 
 #ifndef MAX_SIZE_T
 #define MAX_SIZE_T           (~(size_t)0)
@@ -550,6 +551,10 @@ string::size_type string::find(const value_type *str, size_type pos) const
     const std::ptrdiff_t delta = idx - mData;
 
     return static_cast<size_type>(delta);
+}
+
+ostream& operator<<(ostream& os, const string& str) {
+    return os.write_formatted(str.data(), str.size());
 }
 
 }  // namespace std

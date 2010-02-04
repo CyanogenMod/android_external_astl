@@ -36,6 +36,8 @@
 
 namespace std {
 
+class ostream;
+
 // Simple string implementation. Its purpose is to be able to compile code that
 // uses the STL and requires std::string.
 //
@@ -277,6 +279,9 @@ class string
     size_type mCapacity;  // size of the buffer.
     size_type mLength;  // len of the string excl. null-terminator.
 };
+
+// I/O
+ostream& operator<<(ostream& os, const string& str);
 
 }  // namespace std
 

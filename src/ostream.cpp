@@ -44,9 +44,46 @@ ostream& ostream::operator<<(const char_type *str) {
     return *this;
 }
 
+// 64 bits int in octal is 22 digits. There is one for the sign and 2
+// for the format specifier + 1 for the terminating \0. A total of 26
+// chars should be enough to hold any integer representation.
+static const size_t kNumSize = 26;
+ostream& ostream::operator<<(int val) {
+    const char *fmt = "%d";
+    char buf[kNumSize];
+    int size = snprintf(buf, kNumSize, fmt, val);
+    return write(buf, size);
+}
+
+ostream& ostream::operator<<(unsigned int val) {
+    const char *fmt = "%u";
+    char buf[kNumSize];
+    int size = snprintf(buf, kNumSize, fmt, val);
+    return write(buf, size);
+}
+
+ostream& ostream::operator<<(const void *p) {
+    const char *fmt = "%p";
+    char buf[kNumSize];
+    int size = snprintf(buf, kNumSize, fmt, p);
+    return write(buf, size);
+}
+
+ostream& ostream::write_formatted(const char_type *str, streamsize num) {
+    // TODO: Should format the string according to the flags.
+    return write(str, num);
+}
+
 ostream& ostream::put(char_type c) {
     if (this->rdbuf()) {
         this->rdbuf()->sputn(&c, 1);
+    }
+    return *this;
+}
+
+ostream& ostream::write(const char_type *str, streamsize num) {
+    if (this->rdbuf()) {
+        this->rdbuf()->sputn(str, num);
     }
     return *this;
 }

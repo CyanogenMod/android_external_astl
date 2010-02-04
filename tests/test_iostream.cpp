@@ -32,6 +32,7 @@
 #error "Wrong header included!!"
 #endif
 #include "common.h"
+#include <string>
 
 namespace android {
 
@@ -77,6 +78,16 @@ bool testManip() {
     return true;
 }
 
+bool testOutputFormat() {
+    using std::endl;
+    using std::cout;
+    cout << endl << "Int: " << 10 << endl;
+    cout << "Negative int: " << -10 << endl;
+    cout << "Unsigned int: " << 0xffffffff << endl;
+    cout << "Void *: " << static_cast<void*>(&std::cout) << endl;
+    cout << "string: " << std::string("hello world") << endl;
+    return true;
+}
 }  // namespace android
 
 int main(int argc, char **argv){
@@ -84,5 +95,6 @@ int main(int argc, char **argv){
     FAIL_UNLESS(testOstream);
     FAIL_UNLESS(testCoutCerr);
     FAIL_UNLESS(testManip);
+    FAIL_UNLESS(testOutputFormat);
     return kPassed;
 }

@@ -62,6 +62,7 @@ class ostream: public basic_ios
     // Synchronize the stream buffer.
     ostream& flush();
 
+    // Formatted output.
     /**
      * Interface for manipulators (e.g std::endl, std::hex in
      * expression like "std::cout << std::endl"). See iomanip header.
@@ -73,11 +74,16 @@ class ostream: public basic_ios
     }
 
     ostream& operator<<(const char_type *str);
+    ostream& operator<<(int val);
+    ostream& operator<<(unsigned int val);
+    ostream& operator<<(const void *p);
 
-    /**
-     *  Tries to insert a char.
-     */
+    // This is non standard, used by string.
+    ostream& write_formatted(const char_type *str, streamsize num);
+
+    // Unformatted output.
     ostream& put(char_type c);
+    ostream& write(const char_type *str, streamsize num);
 };
 
 /**
