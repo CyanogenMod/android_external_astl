@@ -32,6 +32,7 @@
 #error "Wrong header included!!"
 #endif
 #include "common.h"
+#include <limits>
 #include <string>
 
 namespace android {
@@ -81,10 +82,27 @@ bool testManip() {
 bool testOutputFormat() {
     using std::endl;
     using std::cout;
-    cout << endl << "Int: " << 10 << endl;
-    cout << "Negative int: " << -10 << endl;
-    cout << "Unsigned int: " << 0xffffffff << endl;
+    using std::numeric_limits;
+    cout << endl << "Int: " << numeric_limits<int>::max() << endl;
+    cout << "Negative int: " << numeric_limits<int>::min() << endl;
+    cout << "Unsigned int: " << numeric_limits<unsigned int>::max() << endl;
+    cout << "Long: " << numeric_limits<long>::max() << endl;
+    cout << "Negative long: " << numeric_limits<long>::min() << endl;
+    cout << "Unsigned long int: " << numeric_limits<unsigned long>::max() << endl;
+    cout << "Long long: " << numeric_limits<long long>::max() << endl;
+    cout << "Negative long long: " << numeric_limits<long long>::min() << endl;
+    cout << "Unsigned long long: " << numeric_limits<unsigned long long>::max() << endl;
+
+    cout.precision(std::numeric_limits<double>::digits10);
+    cout << "Double: " << numeric_limits<double>::max() << endl;
+    cout << "Negative double: " << numeric_limits<double>::min() << endl;
+    cout << "Float: " << numeric_limits<float>::max() << endl;
+    cout << "Negative float: " << numeric_limits<float>::min() << endl;
+
     cout << "Void *: " << static_cast<void*>(&std::cout) << endl;
+    cout << "NULL *: " << static_cast<void*>(0) << endl;
+    cout << "bool: " << true << " " << false << endl;
+    cout << "char: " << 'A' << endl;
     cout << "string: " << std::string("hello world") << endl;
     return true;
 }

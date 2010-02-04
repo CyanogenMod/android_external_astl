@@ -73,9 +73,21 @@ class ostream: public basic_ios
         return *this;
     }
 
-    ostream& operator<<(const char_type *str);
-    ostream& operator<<(int val);
+    ostream& operator<<(unsigned long int val);
+    ostream& operator<<(long int val);
     ostream& operator<<(unsigned int val);
+    ostream& operator<<(int val);
+    ostream& operator<<(unsigned long long int val);
+    ostream& operator<<(long long int val);
+
+    ostream& operator<<(double val);
+    ostream& operator<<(float val);
+
+    ostream& operator<<(char_type c);
+    ostream& operator<<(const char_type *str);
+    ostream& operator<<(bool val);
+
+    // '(nil)' if p == 0
     ostream& operator<<(const void *p);
 
     // This is non standard, used by string.

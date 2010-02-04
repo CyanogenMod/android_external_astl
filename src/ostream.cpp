@@ -29,6 +29,7 @@
 #include <ostream>
 #include <streambuf>
 #include <cstring>
+#include <limits>
 
 namespace std {
 // Defined in bionic/libstdc++/src/one_time_construction.cpp
@@ -42,6 +43,16 @@ ostream& ostream::operator<<(const char_type *str) {
         this->rdbuf()->sputn(str, strlen(str));
     }
     return *this;
+}
+
+ostream& ostream::operator<<(char_type c) {
+    // TODO: Should format according to flags.
+    return put(c);
+}
+
+ostream& ostream::operator<<(bool val) {
+    // TODO: Should format according to flags (e.g write "true" or "false").
+    return put(val?'1':'0');
 }
 
 // 64 bits int in octal is 22 digits. There is one for the sign and 2
@@ -59,6 +70,49 @@ ostream& ostream::operator<<(unsigned int val) {
     const char *fmt = "%u";
     char buf[kNumSize];
     int size = snprintf(buf, kNumSize, fmt, val);
+    return write(buf, size);
+}
+
+ostream& ostream::operator<<(long int val) {
+    const char *fmt = "%ld";
+    char buf[kNumSize];
+    int size = snprintf(buf, kNumSize, fmt, val);
+    return write(buf, size);
+}
+
+ostream& ostream::operator<<(unsigned long int val) {
+    const char *fmt = "%lu";
+    char buf[kNumSize];
+    int size = snprintf(buf, kNumSize, fmt, val);
+    return write(buf, size);
+}
+
+ostream& ostream::operator<<(long long int val) {
+    const char *fmt = "%lld";
+    char buf[kNumSize];
+    int size = snprintf(buf, kNumSize, fmt, val);
+    return write(buf, size);
+}
+
+ostream& ostream::operator<<(unsigned long long int val) {
+    const char *fmt = "%llu";
+    char buf[kNumSize];
+    int size = snprintf(buf, kNumSize, fmt, val);
+    return write(buf, size);
+}
+
+// Double max 1.7976931348623157E+308 = 23 < kNumSize so we reuse it.
+ostream& ostream::operator<<(double val) {
+    const char *fmt = "%.*e";
+    char buf[kNumSize];
+    int size = snprintf(buf, kNumSize, fmt, precision(), val);
+    return write(buf, size);
+}
+
+ostream& ostream::operator<<(float val) {
+    const char *fmt = "%.*e";
+    char buf[kNumSize];
+    int size = snprintf(buf, kNumSize, fmt, precision(), val);
     return write(buf, size);
 }
 
