@@ -73,6 +73,7 @@ sources := \
    test_list.cpp \
    test_memory.cpp \
    test_set.cpp \
+   test_sstream.cpp \
    test_streambuf.cpp \
    test_string.cpp \
    test_type_traits.cpp \

@@ -23,6 +23,7 @@ astl_common_src_files := \
     ios_pos_types.cpp \
     list.cpp \
     ostream.cpp \
+    sstream.cpp \
     stdio_filebuf.cpp \
     streambuf.cpp \
     string.cpp

@@ -56,6 +56,18 @@ enum IosBaseFlags {
     ios_baseflags_floatfield  = ios_baseflags_scientific | ios_baseflags_fixed,
     ios_baseflags_end         = 1 << 15
 };
+
+// Openmode
+enum IosBaseOpenmode {
+    ios_baseopenmode_app    = 1 << 0,
+    ios_baseopenmode_ate    = 1 << 1,
+    ios_baseopenmode_binary = 1 << 2,
+    ios_baseopenmode_in     = 1 << 3,
+    ios_baseopenmode_out    = 1 << 4,
+    ios_baseopenmode_trunc  = 1 << 5,
+    ios_baseopenmode_end    = 1 << 6
+};
+
 }  // namespace android
 
 namespace std {
@@ -74,9 +86,6 @@ namespace std {
 class ios_base
 {
   public:
-    typedef int io_state;
-    typedef int open_mode;
-    typedef int seek_dir;
     typedef std::streampos streampos;
     typedef std::streamoff streamoff;
 
@@ -87,6 +96,11 @@ class ios_base
   public:
     virtual ~ios_base();
     typedef int fmtflags;
+    typedef int iostate;
+    typedef int openmode;
+    typedef int seekdir;
+
+    // FLAGS
 
     // boolalpha:  Insert and extract bool type in alphabetic format.
     // dec:        Convert integer input or generates integer output in
@@ -150,6 +164,24 @@ class ios_base
 
     // Clears 'mask'.
     void unsetf(fmtflags mask);
+
+
+    // OPENMODE
+
+    // app:    seek to end before each write.
+    // ate:    open and seek to end imediately after opening.
+    // binary: perform I/O in binary mode.
+    // in:     open for input.
+    // out:    open for output.
+    // trunc:  truncate and existing stream when opening.
+    static const openmode app = android::ios_baseopenmode_app;
+    static const openmode ate = android::ios_baseopenmode_ate;
+    static const openmode binary = android::ios_baseopenmode_binary;
+    static const openmode in = android::ios_baseopenmode_in;
+    static const openmode out = android::ios_baseopenmode_out;
+    static const openmode trunc = android::ios_baseopenmode_trunc;
+
+    // PRECISION and WIDTH
 
     /**
      * @return The precision (number of digits after the decimal
