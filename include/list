@@ -171,10 +171,10 @@ class list {
     void clear();
 
     // Element access.
-    reference front() { return *begin(); }
-    const_reference front() const { return *begin(); }
-    reference back() { return *(end()--); }
-    const_reference back() const { return *(end()--); }
+    reference front() { return *iterator(mHead.mNext); }
+    const_reference front() const { return *iterator(mHead.mNext); }
+    reference back() { return *iterator(mHead.mPrev); }
+    const_reference back() const { return *iterator(mHead.mPrev); }
 
     // Iterators.
     iterator begin() { return iterator(mHead.mNext); }
@@ -186,6 +186,13 @@ class list {
     // @param elt To be added.
     void push_front(const value_type& elt) { insert(begin(), elt); }
     void push_back(const value_type& elt) { insert(end(), elt); }
+
+    // Removes first element. Invalidated the iterators/references to begin.
+    void pop_front() { eraseAtPos(iterator(mHead.mNext)); }
+
+    // Removes last element. Invalidated the iterators/references to
+    // the last element.
+    void pop_back() { eraseAtPos(iterator(mHead.mPrev)); }
 
     bool empty() const { return mLength == 0; }
 
@@ -201,12 +208,28 @@ class list {
     // @return an iterator that points to the inserted element.
     iterator insert(iterator pos, const value_type& elt);
 
+    // Remove the element pointed by the iterator. Constant in time,
+    // calls once to _T's destructor.
+    // @param pos Iterator pointing to the elt to be removed.
+    // @return An iterator pointing to the next elt or end().
+    iterator erase(iterator position);
+
+    // Remove a range of elements [first, last)
+    // @param first Iterator pointing to the first element to be removed.
+    // @param last Iterator pointing to one past the last element to be removed.
+    // @return An iterator pointing to the elt next to 'last' or end().
+    iterator erase(iterator first, iterator last);
+
   private:
     void init() {
         mHead.mNext = &mHead;
         mHead.mPrev = &mHead;
         mLength = 0;
     }
+
+    // Erase, don't return anything.
+    void eraseAtPos(iterator pos);
+
     size_type mLength;
     // mHead does not contain any data, it represents end().
     android::ListNodeBase mHead;
@@ -235,6 +258,32 @@ typename list<_T>::iterator list<_T>::insert(iterator pos, const value_type& elt
         return iterator(node);
     } else {
         return end();
+    }
+}
+
+template<typename _T>
+typename list<_T>::iterator list<_T>::erase(iterator pos) {
+    iterator res = iterator(pos.mNode->mNext);
+    eraseAtPos(pos);
+    return res;
+}
+
+template<typename _T>
+typename list<_T>::iterator list<_T>::erase(iterator first, iterator last) {
+    while (first != last) {
+        first = erase(first);  // erase returns an iterator to the next elt.
+    }
+    return last;
+}
+
+template<typename _T>
+void list<_T>::eraseAtPos(iterator pos) {
+    if (pos.mNode != &mHead) {
+        pos.mNode->unhook();
+        android::ListNode<_T>* node =
+                static_cast<android::ListNode<_T>*>(pos.mNode);
+        delete node;
+        --mLength;
     }
 }
 

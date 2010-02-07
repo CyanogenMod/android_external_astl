@@ -115,6 +115,71 @@ bool testIterator()
     return true;
 }
 
+bool testErase() {
+    list<int> l;
+    for (int i = 0; i < 100; ++i) {
+        l.push_back(i);
+    }
+
+    // Deleting the first element.
+    list<int>::iterator val = l.erase(l.begin());
+    EXPECT_TRUE(l.size() == 99);
+    EXPECT_TRUE(*val == 1);
+
+    // Deleting the last should be a no op.
+    l.erase(l.end());
+    EXPECT_TRUE(l.size() == 99);
+
+    // Empty bay removing the last element;
+    while (l.size() > 0) {
+        val = l.erase(--l.end());
+    }
+
+    EXPECT_TRUE(l.size() == 0);
+    EXPECT_TRUE(val == l.end());
+
+    return true;
+}
+
+bool testEraseRange() {
+    list<int> l;
+    for (int i = 0; i < 100; ++i) {
+        l.push_back(i);
+    }
+    l.erase(l.begin(), l.end());
+    EXPECT_TRUE(l.size() == 0);
+    return true;
+}
+
+bool testPushPop() {
+    list<int> l;
+
+    l.push_front(10);
+    EXPECT_TRUE(l.front() == 10);
+    l.push_back(100);
+    EXPECT_TRUE(l.back() == 100);
+
+    l.push_front(1);
+    EXPECT_TRUE(l.front() == 1);
+    l.push_back(1000);
+    EXPECT_TRUE(l.back() == 1000);
+
+    l.pop_front();
+    EXPECT_TRUE(l.front() == 10);
+    l.pop_back();
+    EXPECT_TRUE(l.back() == 100);
+    l.pop_front();
+    EXPECT_TRUE(l.front() == 100);
+    EXPECT_TRUE(l.back() == 100);
+    l.pop_back();
+    EXPECT_TRUE(l.empty());
+    // all these are noops
+    l.pop_back();
+    l.pop_front();
+    l.pop_back();
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -123,5 +188,8 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testSize);
     FAIL_UNLESS(testClear);
     FAIL_UNLESS(testIterator);
+    FAIL_UNLESS(testErase);
+    FAIL_UNLESS(testEraseRange);
+    FAIL_UNLESS(testPushPop);
     return kPassed;
 }
