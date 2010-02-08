@@ -257,6 +257,22 @@ class string
     // starting position.
     size_type find(const value_type *str, size_type pos = 0) const;
 
+    // Find the lowest position xpos, if possible, such that:
+    //   pos <= xpos && xpos < size()
+    //   at(xpos) == c
+    // @return xpos if it exists, npos otherwise.
+    size_type find(const value_type c, size_type pos = 0) const {
+        return find_first_of(c, pos);
+    }
+
+    // Find the highest position xpos, if possible, such that:
+    //   xpos <= pos && xpos < size()
+    //   at(xpos) == c
+    // @return xpos if it exists, npos otherwise.
+    size_type rfind(const value_type c, size_type pos = npos) const {
+        return find_last_of(c, pos);
+    }
+
     // Iterators
     iterator begin() {return iterator(mData);}
     const_iterator begin() const {return const_iterator(mData);}
@@ -266,6 +282,12 @@ class string
     // @return the substring [pos, pos + n].
     // Requires pos <= size(). If n > size() - pos, size() - pos is used.
     string substr(size_type pos = 0, size_type n = npos) const;
+
+    // Find char methods. Return the position or npos if the char was not found.
+    size_type find_first_of(value_type c, size_type pos = 0) const;
+    size_type find_last_of(value_type c, size_type pos = npos) const;
+    size_type find_first_not_of(value_type c, size_type pos = 0) const;
+    size_type find_last_not_of(value_type c, size_type pos = npos) const;
 
   private:
     bool SafeMalloc(size_type n);

@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Build control file for Bionic's test programs
-# define the BIONIC_TESTS environment variable to build the test programs
-#
 
 # define the ASTL_TESTS environment variable to build the test programs
 ifdef ASTL_TESTS

@@ -560,6 +560,59 @@ string string::substr(size_type pos, size_type n) const {
     return string(*this, pos, n);
 }
 
+string::size_type string::find_first_of(value_type c, size_type pos) const {
+    if (pos >= mLength) {
+        return npos;
+    }
+    const char *res;
+    // The last parameter represents a number of chars, not a index.
+    res = static_cast<const char *>(std::memchr(mData + pos, c, mLength - pos));
+    return res != NULL ? res - mData : npos;
+}
+
+string::size_type string::find_last_of(value_type c, size_type pos) const {
+    if (mLength == 0) {
+        return npos;
+    } else if (pos >= mLength) {
+        pos = mLength - 1;  // >= 0
+    }
+
+    const char *res;
+    // Note:memrchr is not in the std namepace.
+    // The last parameter represents a number of chars, not a index.
+    res = static_cast<const char *>(memrchr(mData, c, pos + 1));
+    return res != NULL ? res - mData : npos;
+}
+
+string::size_type string::find_first_not_of(value_type c, size_type pos) const {
+    char *curr = mData + pos;
+    for (size_type i = pos; i < mLength; ++i, ++curr) {
+        if (c != *curr) {
+            return i;
+        }
+    }
+    return npos;
+}
+
+string::size_type string::find_last_not_of(value_type c, size_type pos) const {
+    if (mLength == 0) {
+        return npos;
+    } else if (pos >= mLength) {
+        pos = mLength - 1;  // >= 0
+    }
+
+    char *curr = mData + pos;
+    size_type i = pos;
+
+    for (;; --i, --curr) {
+        if (c != *curr) {
+            return i;
+        } else if (i == 0) {
+            return npos;
+        }
+    }
+}
+
 ostream& operator<<(ostream& os, const string& str) {
     return os.write_formatted(str.data(), str.size());
 }

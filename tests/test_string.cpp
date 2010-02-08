@@ -714,8 +714,8 @@ bool testFind()
   string haystack("one two three one two three");
 
   // Don't die on null strings
-  EXPECT_TRUE(haystack.find(NULL) == string::npos);
-  EXPECT_TRUE(haystack.find(NULL, 10) == string::npos);
+  EXPECT_TRUE(haystack.find((char*)NULL) == string::npos);
+  EXPECT_TRUE(haystack.find((char*)NULL, 10) == string::npos);
 
   // C strings.
   EXPECT_TRUE(haystack.find("one") == 0);
@@ -943,6 +943,85 @@ bool testSubstr() {
     return true;
 }
 
+bool testCharSearch() {
+    {
+        string s;
+        EXPECT_TRUE(s.find_first_of('a') == string::npos);
+        s = "abracadabra";
+        EXPECT_TRUE(s.find_first_of('a') == 0);
+        EXPECT_TRUE(s.find_first_of('a', 0) == 0);
+        EXPECT_TRUE(s.find_first_of('a', 1) == 3);
+        EXPECT_TRUE(s.find_first_of('a', 8) == 10);
+        s = "zzzzzzza";
+        EXPECT_TRUE(s.find_first_of('a') == 7);
+        EXPECT_TRUE(s.find_first_of('a', 8) == string::npos); // out of bound
+    }
+    // For char (set of size 1) find_first_of is equive to find(char, pos)
+    {
+        string s;
+        EXPECT_TRUE(s.find('a') == string::npos);
+        s = "abracadabra";
+        EXPECT_TRUE(s.find('a') == 0);
+        EXPECT_TRUE(s.find('a', 0) == 0);
+        EXPECT_TRUE(s.find('a', 1) == 3);
+        EXPECT_TRUE(s.find('a', 8) == 10);
+        s = "zzzzzzza";
+        EXPECT_TRUE(s.find('a') == 7);
+        EXPECT_TRUE(s.find('a', 8) == string::npos); // out of bound
+    }
+    {
+        string s;
+        EXPECT_TRUE(s.find_last_of('a') == string::npos);
+        EXPECT_TRUE(s.find_last_of('a', 0) == string::npos);
+        EXPECT_TRUE(s.find_last_of('a', 10) == string::npos);
+        s = "abracadabra";
+        EXPECT_TRUE(s.find_last_of('a', 10) == 10);
+        EXPECT_TRUE(s.find_last_of('a', 9) == 7);
+        EXPECT_TRUE(s.find_last_of('a', 0) == 0);
+        s = "azzzzzzz";
+        EXPECT_TRUE(s.find_last_of('a') == 0);
+    }
+    // For char (set of size 1) find_last_of is equiv to rfind(char, pos).
+    {
+        string s;
+        EXPECT_TRUE(s.rfind('a') == string::npos);
+        EXPECT_TRUE(s.rfind('a', 0) == string::npos);
+        EXPECT_TRUE(s.rfind('a', 10) == string::npos);
+        s = "abracadabra";
+        EXPECT_TRUE(s.rfind('a', 10) == 10);
+        EXPECT_TRUE(s.rfind('a', 9) == 7);
+        EXPECT_TRUE(s.rfind('a', 0) == 0);
+        s = "azzzzzzz";
+        EXPECT_TRUE(s.rfind('a') == 0);
+    }
+    {
+        string s;
+        EXPECT_TRUE(s.find_first_not_of('a') == string::npos);
+        s = "abracadabra";
+        EXPECT_TRUE(s.find_first_not_of('a') == 1);
+        EXPECT_TRUE(s.find_first_not_of('a', 0) == 1);
+        EXPECT_TRUE(s.find_first_not_of('a', 1) == 1);
+        EXPECT_TRUE(s.find_first_not_of('a', 7) == 8);
+        s = "zzzzzzza";
+        EXPECT_TRUE(s.find_first_not_of('a') == 0);
+        EXPECT_TRUE(s.find_first_not_of('a', 8) == string::npos); // out of bound
+    }
+    {
+        string s;
+        EXPECT_TRUE(s.find_last_not_of('a') == string::npos);
+        EXPECT_TRUE(s.find_last_not_of('a', 0) == string::npos);
+        EXPECT_TRUE(s.find_last_not_of('a', 10) == string::npos);
+        s = "abracadabra";
+        EXPECT_TRUE(s.find_last_not_of('a') == 9);
+        EXPECT_TRUE(s.find_last_not_of('a', 10) == 9);
+        EXPECT_TRUE(s.find_last_not_of('a', 9) == 9);
+        EXPECT_TRUE(s.find_last_not_of('a', 0) == string::npos);
+        s = "azzzzzzz";
+        EXPECT_TRUE(s.find_last_not_of('a') == 7);
+    }
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -971,5 +1050,6 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testConstIterator);
     FAIL_UNLESS(testForwardIterator);
     FAIL_UNLESS(testSubstr);
+    FAIL_UNLESS(testCharSearch);
     return kPassed;
 }
