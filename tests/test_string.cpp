@@ -488,6 +488,22 @@ bool testCompare()
 
     string str06;
     EXPECT_TRUE(str06 != NULL);
+    {
+        string str_long("this is");
+        string str_short("it");
+        EXPECT_TRUE(str_long > str_short);
+        EXPECT_TRUE(str_long >= str_short);
+        EXPECT_FALSE(str_long < str_short);
+        EXPECT_FALSE(str_long <= str_short);
+    }
+    {
+        string str_lhs("this is");
+        string str_rhs("this is");
+        EXPECT_FALSE(str_lhs > str_rhs);
+        EXPECT_TRUE(str_lhs >= str_rhs);
+        EXPECT_FALSE(str_lhs < str_rhs);
+        EXPECT_TRUE(str_lhs <= str_rhs);
+    }
     return true;
 }
 

@@ -613,6 +613,26 @@ string::size_type string::find_last_not_of(value_type c, size_type pos) const {
     }
 }
 
+bool operator<(const string& lhs, const string& rhs) {
+    return lhs.compare(rhs) < 0;
+}
+
+bool operator<=(const string& lhs, const string& rhs) {
+    return lhs.compare(rhs) <= 0;
+}
+
+bool operator>(const string& lhs, const string& rhs) {
+    return lhs.compare(rhs) > 0;
+}
+
+bool operator>=(const string& lhs, const string& rhs) {
+    return lhs.compare(rhs) >= 0;
+}
+
+void swap(string& lhs, string& rhs) {
+    lhs.swap(rhs);
+}
+
 ostream& operator<<(ostream& os, const string& str) {
     return os.write_formatted(str.data(), str.size());
 }

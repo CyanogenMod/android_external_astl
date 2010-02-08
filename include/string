@@ -306,6 +306,15 @@ class string
     size_type mLength;  // len of the string excl. null-terminator.
 };
 
+// Comparaison:
+bool operator<(const string& lhs, const string& rhs);
+bool operator<=(const string& lhs, const string& rhs);
+bool operator>(const string& lhs, const string& rhs);
+bool operator>=(const string& lhs, const string& rhs);
+
+// Swap
+void swap(string& lhs, string& rhs);
+
 // I/O
 ostream& operator<<(ostream& os, const string& str);
 
