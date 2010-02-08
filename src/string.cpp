@@ -185,8 +185,11 @@ string::string(const string& str)
 
 string::string(const string& str, size_type pos, size_type n)
 {
-    if (pos < str.mLength && n <= (str.mLength - pos))
+    if (pos < str.mLength)
     {
+        if (n > (str.mLength - pos)) {
+            n = str.mLength - pos;
+        }
         Constructor(str.mData + pos , n);
     }
     else
@@ -551,6 +554,10 @@ string::size_type string::find(const value_type *str, size_type pos) const
     const std::ptrdiff_t delta = idx - mData;
 
     return static_cast<size_type>(delta);
+}
+
+string string::substr(size_type pos, size_type n) const {
+    return string(*this, pos, n);
 }
 
 ostream& operator<<(ostream& os, const string& str) {

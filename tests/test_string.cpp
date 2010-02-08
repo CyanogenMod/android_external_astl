@@ -188,8 +188,8 @@ bool testConstructorInvalidValues()
     string str04(str01, -1, 0);  // invalid index
     EXPECT_TRUE(str04.c_str() == empty.c_str());
 
-    string str05(str01, 0, 17);  // invalid length
-    EXPECT_TRUE(str05.c_str() == empty.c_str());
+    string str05(str01, 0, 17);  // invalid length -> clamped
+    EXPECT_TRUE(str05 == str01);
 
     string str06(str01, 17);  // invalid index
     EXPECT_TRUE(str06.c_str() == empty.c_str());
@@ -914,6 +914,35 @@ bool testForwardIterator()
     return true;
 }
 
+bool testSubstr() {
+    {
+        string s;
+        string res = s.substr(10, 1);
+        EXPECT_TRUE(res.empty());
+    }
+    {
+        string s = "pandora radio";
+        string res = s.substr(string::npos, 1);
+        EXPECT_TRUE(res.empty());
+    }
+    {
+        string s = "pandora radio";
+        string res = s.substr(5, 1000);
+        EXPECT_TRUE(res == "ra radio");
+    }
+    {
+        string s = "pandora radio";
+        string res = s.substr(5, 0);
+        EXPECT_TRUE(res.empty());
+    }
+    {
+        string s = "pandora radio";
+        string res = s.substr(5, 5);
+        EXPECT_TRUE(res == "ra ra");
+    }
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -941,5 +970,6 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testErase);
     FAIL_UNLESS(testConstIterator);
     FAIL_UNLESS(testForwardIterator);
+    FAIL_UNLESS(testSubstr);
     return kPassed;
 }

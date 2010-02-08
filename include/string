@@ -263,6 +263,10 @@ class string
     iterator end() {return iterator(mData + mLength);}
     const_iterator end() const {return const_iterator(mData + mLength);}
 
+    // @return the substring [pos, pos + n].
+    // Requires pos <= size(). If n > size() - pos, size() - pos is used.
+    string substr(size_type pos = 0, size_type n = npos) const;
+
   private:
     bool SafeMalloc(size_type n);
     void SafeRealloc(size_type n);
