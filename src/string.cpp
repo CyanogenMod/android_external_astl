@@ -337,6 +337,22 @@ string& string::append(const string& str)
     return *this;
 }
 
+// Specialization to append from other strings' iterators.
+template<>
+string& string::append<__wrapper_iterator<const char *,string> >(
+    __wrapper_iterator<const char *,string> first,
+    __wrapper_iterator<const char *,string> last) {
+    Append(&*first, std::distance(first, last));
+    return *this;
+}
+template<>
+string& string::append<__wrapper_iterator<char *,string> >(
+    __wrapper_iterator<char *,string> first,
+    __wrapper_iterator<char *,string> last) {
+    Append(&*first, std::distance(first, last));
+    return *this;
+}
+
 void string::push_back(const char c)
 {
     // Check we don't overflow.

@@ -30,6 +30,7 @@
 #ifndef ANDROID_ASTL_STRING__
 #define ANDROID_ASTL_STRING__
 
+#include <algorithm>
 #include <cstddef>
 #include <iterator>
 #include <char_traits.h>
@@ -160,6 +161,9 @@ class string
     // no-op if str is NULL. pos and n must be >= 0.
     string& append(const value_type *str, size_type pos, size_type n);
     string& append(const string& str);
+
+    template<typename _InputIterator>
+    string& append(_InputIterator first, _InputIterator last);
 
     // Comparison.
     // @return 0 if this==other, < 0 if this < other and > 0 if this > other.
@@ -324,6 +328,37 @@ void swap(string& lhs, string& rhs);
 
 // I/O
 ostream& operator<<(ostream& os, const string& str);
+
+
+// Specialization of append(iterator, iterator) using string iterators
+// (const and non const).
+template<>
+string& string::append<__wrapper_iterator<const char *,string> >(
+    __wrapper_iterator<const char *,string> first,
+    __wrapper_iterator<const char *,string> last);
+template<>
+string& string::append<__wrapper_iterator<char *,string> >(
+    __wrapper_iterator<char *,string> first,
+    __wrapper_iterator<char *,string> last);
+
+// append(iterator,iterator) default implementation.
+template<typename _InputIterator>
+string& string::append(_InputIterator first, _InputIterator last) {
+    size_type dist = std::distance(first, last);
+    size_type new_len = mLength + dist;
+    if (new_len <= mLength) {
+        return *this;  // 0 / overflow
+    }
+    reserve(new_len);
+    if (new_len > mCapacity) {
+        return *this;  // memory allocation failed.
+    }
+    std::copy(first, last, mData + mLength);
+    mLength = new_len;
+    mData[mLength] = '\0';
+    return *this;
+}
+
 
 }  // namespace std
 

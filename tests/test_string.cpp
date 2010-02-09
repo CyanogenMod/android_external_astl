@@ -34,6 +34,7 @@
 #include <climits>
 #include <cstring>
 #include <algorithm>
+#include <list>
 #include "common.h"
 
 
@@ -386,6 +387,42 @@ bool testAppend()
     str12.append(dummy, kMaxSizeT);
     EXPECT_TRUE(str12 == "original");
 
+    // Append iterator.
+    {
+        string str1("once upon ");
+        const string str2("a time");
+
+        str1.append(str2.begin(), str2.end());
+        EXPECT_TRUE(str1.size() == 16);
+        EXPECT_TRUE(str1 == "once upon a time");
+    }
+    {
+        string str1("once upon ");
+        string str2("a time");
+
+        str1.append(str2.begin(), str2.begin());
+        EXPECT_TRUE(str1.size() == 10);
+        EXPECT_TRUE(str1 == "once upon ");
+    }
+    {
+        string str1;
+        string str2("hello");
+
+        str1.append(str2.begin(), str2.end());
+        EXPECT_TRUE(str1.size() == 5);
+        EXPECT_TRUE(str1 == "hello");
+    }
+    {
+        string str1("hello ");
+        std::list<char> list1;
+        list1.push_back('w');
+        list1.push_back('o');
+        list1.push_back('r');
+        list1.push_back('l');
+        list1.push_back('d');
+        str1.append(list1.begin(), list1.end());
+        EXPECT_TRUE(str1 == "hello world");
+    }
     return true;
 }
 
