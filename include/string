@@ -235,6 +235,13 @@ class string
         return string(&left, 1).append(right);
     }
 
+    // Insert a copy of c before the character referred to by pos.
+    // @param pos A valid iterator on *this.
+    // @return An iterator which refers to the copy of the inserted
+    // character. Because internally some reallocation may occur, the
+    // returned iterator may be different from 'pos'.
+    iterator insert(iterator pos, char c);
+
     // Find the position of a sub-string. The empty string is always
     // found at the requested position except when it's beyond the
     // string's end.

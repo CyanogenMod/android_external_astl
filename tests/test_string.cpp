@@ -1038,6 +1038,32 @@ bool testCharSearch() {
     return true;
 }
 
+
+bool testInsert() {
+    {
+        string::iterator res;
+        string str("zzzzzz");
+        res = str.insert(str.begin(), 'a');
+        EXPECT_TRUE(str == "azzzzzz");
+        EXPECT_TRUE(*res == 'a');
+
+        res = str.insert(str.begin() + 3, 'b');
+        EXPECT_TRUE(str == "azzbzzzz");
+        EXPECT_TRUE(*res == 'b');
+
+        res = str.insert(str.end(), 'c');
+        EXPECT_TRUE(str == "azzbzzzzc");
+        EXPECT_TRUE(*res == 'c');
+    }
+    {
+        string str;
+        string::iterator res = str.insert(str.begin(), 'a');
+        EXPECT_TRUE(str == "a");
+        EXPECT_TRUE(*res == 'a');
+    }
+    return true;
+}
+
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -1067,5 +1093,6 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testForwardIterator);
     FAIL_UNLESS(testSubstr);
     FAIL_UNLESS(testCharSearch);
+    FAIL_UNLESS(testInsert);
     return kPassed;
 }

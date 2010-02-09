@@ -516,6 +516,31 @@ string& string::assign(const value_type *array, size_type n)
     return *this;
 }
 
+string::iterator string::insert(iterator iter, char c) {
+    const size_type new_len = mLength + 1;
+    char *base = iter.base();
+
+    if (base < mData || base > mData + mLength || new_len < mLength) {
+        return iterator(&sDummy);  // out of bound || overflow
+    }
+
+    const size_type pos = base - mData;
+    if (new_len > mCapacity) {
+        reserve(new_len);
+        if (new_len > mCapacity) {
+            return iterator(&sDummy);  // not enough memory?
+        }
+    }
+    // At this point 'iter' and 'base' are not valid anymore since
+    // realloc could have taken place.
+    base = mData + pos;
+    std::memmove(base + 1, base, mLength - pos);
+    *base = c;
+    mLength = new_len;
+    mData[mLength] = 0;
+    return iterator(base);
+}
+
 string& string::operator=(char c)
 {
     clear();
