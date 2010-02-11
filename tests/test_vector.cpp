@@ -641,6 +641,14 @@ bool testEraseRange()
     return true;
 }
 
+// Valgrind should not barf when we access element out of bound.
+bool testAt() {
+    vector<int> vec;
+
+    vec.at(1000) = 0xdeadbeef;
+    EXPECT_TRUE(vec.at(1000) == 0xdeadbeef);
+    return true;
+}
 }  // namespace android
 
 int main(int argc, char **argv)
@@ -659,5 +667,6 @@ int main(int argc, char **argv)
     FAIL_UNLESS(testCtorDtorForNonPod);
     FAIL_UNLESS(testEraseElt);
     FAIL_UNLESS(testEraseRange);
+    FAIL_UNLESS(testAt);
     return kPassed;
 }

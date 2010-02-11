@@ -132,6 +132,13 @@ class vector
     // @return A reference to the element.
     reference operator[](size_type index) { return *(mBegin + index); }
 
+    // 'at' is similar to operator[] except that it does check bounds.
+    const_reference at(const size_type index) const
+    { return index < mLength ? *( mBegin + index) : sDummy; }
+
+    reference at(const size_type index)
+    { return index < mLength ? *( mBegin + index) : sDummy; }
+
     iterator begin() { return iterator(mBegin); }
     iterator end() { return iterator(mBegin + mLength); }
 
@@ -217,6 +224,7 @@ class vector
     pointer mBegin;
     size_type mCapacity;
     size_type mLength;
+    static value_type sDummy;  // at() doen't throw exception and returns mDummy.
     static const size_type kExponentialFactor = 2;
     static const size_type kExponentialLimit = 256;
     static const size_type kLinearIncrement = 256;
@@ -233,6 +241,7 @@ class vector
 // aligned. I believe the bionic implementation uses a minimum of 8 or 16.
 //
 // Invariant: mLength <= mCapacity <= max_size()
+
 
 template<typename _T>
 vector<_T>::vector()
@@ -489,6 +498,9 @@ void vector<_T>::deallocate()
     }
     free(mBegin);
 }
+
+// Dummy element returned when at() is out of bound.
+template<typename _T> _T vector<_T>::sDummy;
 
 }  // namespace std
 
