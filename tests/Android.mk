@@ -13,48 +13,51 @@
 # limitations under the License.
 #
 
-# define the ASTL_TESTS environment variable to build the test programs
-ifdef ASTL_TESTS
+# To integrate with the nightly build, we use
+#   LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)
+# to put the tests under /data and not /system/bin (default).
 
 LOCAL_PATH := $(call my-dir)
 
-# used to define a simple test program and build it as a standalone
-# device executable.
-#
-# you can use EXTRA_CFLAGS to indicate additional CFLAGS to use
-# in the build. the variable will be cleaned on exit
-#
-define device-test
-  $(foreach file,$(1), \
-    $(eval include $(CLEAR_VARS)) \
-    $(eval LOCAL_SRC_FILES := $(file)) \
-    $(eval LOCAL_MODULE := $(notdir $(file:%.cpp=%))) \
-    $(eval $(info LOCAL_MODULE=$(LOCAL_MODULE))) \
-    $(eval LOCAL_CFLAGS += $(EXTRA_CFLAGS)) \
-    $(eval LOCAL_MODULE_TAGS := tests) \
-    $(eval LOCAL_STATIC_LIBRARIES := libastl) \
-    $(eval include $(BUILD_EXECUTABLE)) \
-  ) \
-  $(eval EXTRA_CFLAGS :=)
+libastl_test_includes:= \
+	bionic/libstdc++/include \
+	external/astl/include
+libastl_test_static_lib := libastl
+libastl_test_host_static_lib := libastl_host
+
+# $(3) and $(5) must be set or cleared in sync. $(3) is used to
+# generate the right make target (host vs device). $(5) is used in the
+# module's name to have different name for the host vs device
+# builds. Also $(5) is used to pickup the right set of libraries,
+# typically the host libs have a _host suffix in their names.
+# $(1): source list
+# $(2): tags
+# $(3): "HOST_" or empty
+# $(4): extra CFLAGS or empty
+# $(5): "_host" or empty
+define _define-test
+$(foreach file,$(1), \
+  $(eval include $(CLEAR_VARS)) \
+  $(eval LOCAL_SRC_FILES := $(file)) \
+  $(eval LOCAL_C_INCLUDES := $(libastl_test_includes)) \
+  $(eval LOCAL_MODULE := $(notdir $(file:%.cpp=%))$(5)) \
+  $(eval LOCAL_CFLAGS += $(4)) \
+  $(eval LOCAL_STATIC_LIBRARIES := $(libastl_test$(5)_static_lib)) \
+  $(eval LOCAL_MODULE_TAGS := $(2) ) \
+  $(eval LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)) \
+  $(eval include $(BUILD_$(3)EXECUTABLE)) \
+)
 endef
 
-# same as 'device-test' but builds a host executable instead
-# you can use EXTRA_LDLIBS to indicate additional linker flags
-#
+ifeq ($(HOST_OS),linux)
+# Compile using the host only on linux for valgrind support.
 define host-test
-  $(foreach file,$(1), \
-    $(eval include $(CLEAR_VARS)) \
-    $(eval LOCAL_SRC_FILES := $(file)) \
-    $(eval LOCAL_MODULE := $(notdir $(file:%.cpp=%))) \
-    $(eval $(info LOCAL_MODULE=$(LOCAL_MODULE) file=$(file))) \
-    $(eval LOCAL_CFLAGS += $(EXTRA_CFLAGS))  \
-    $(eval LOCAL_LDLIBS += $(EXTRA_LDLIBS)) \
-    $(eval LOCAL_MODULE_TAGS := eng tests) \
-    $(eval LOCAL_STATIC_LIBRARIES := libastl) \
-    $(eval include $(BUILD_HOST_EXECUTABLE)) \
-  ) \
-  $(eval EXTRA_CFLAGS :=) \
-  $(eval EXTRA_LDLIBS :=)
+$(call _define-test,$(1),eng,HOST_,-O0 -g,_host)
+endef
+endif
+
+define target-test
+$(call _define-test,$(1),eng tests)
 endef
 
 sources := \
@@ -77,11 +80,9 @@ sources := \
    test_uninitialized.cpp \
    test_vector.cpp
 
-# Disable all optimization for the host target to help test tools (valgrind...)
-EXTRA_CFLAGS := -I bionic/libstdc++/include -I external/astl/include -g -O0
+ifeq ($(HOST_OS),linux)
 $(call host-test, $(sources))
+endif
 
-EXTRA_CFLAGS := -I bionic/libstdc++/include -I external/astl/include
 $(call device-test, $(sources))
 
-endif  #ASTL_TESTS
