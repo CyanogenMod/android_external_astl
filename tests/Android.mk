@@ -44,7 +44,7 @@ $(foreach file,$(1), \
   $(eval LOCAL_CFLAGS += $(4)) \
   $(eval LOCAL_STATIC_LIBRARIES := $(libastl_test$(5)_static_lib)) \
   $(eval LOCAL_MODULE_TAGS := $(2) ) \
-  $(eval LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS)) \
+  $(eval $(if $(3),,LOCAL_MODULE_PATH := $(TARGET_OUT_DATA_APPS))) \
   $(eval include $(BUILD_$(3)EXECUTABLE)) \
 )
 endef
@@ -85,4 +85,3 @@ $(call host-test, $(sources))
 endif
 
 $(call device-test, $(sources))
-
