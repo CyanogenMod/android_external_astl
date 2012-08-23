@@ -52,7 +52,7 @@ endef
 ifeq ($(HOST_OS),linux)
 # Compile using the host only on linux for valgrind support.
 define host-test
-$(call _define-test,$(1),eng,HOST_,-O0 -g,_host)
+$(call _define-test,$(1),optional,HOST_,-O0 -g,_host)
 endef
 endif
 
